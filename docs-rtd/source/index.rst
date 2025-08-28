@@ -45,9 +45,8 @@ Table of Contents
   developer-resources/Amazon-DCV-Setup-Guide.rst
 
   ERRATA
-  RELEASE-NOTES
 
-  all-links
+  RELEASE-NOTES
 
 This development kit includes example programs and RTL that are easy to build and demonstrate the platform's capabilities. Several examples are listed below.
 
@@ -59,3 +58,5 @@ Example Applications
 
   hdk/cl/examples/cl-sde/software/src/README
   sdk/apps/virtual-ethernet/README
+
+For a listing of all pages on our ReadTheDocs site, `click here <./all-links.html>`__.
