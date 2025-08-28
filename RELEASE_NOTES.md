@@ -2,7 +2,7 @@
 
 ## v2.2.0
 
-* Release of Vivado/Vitis 2025.1 Tools on [FPGA Developer AMI 1.18.0 (Ubuntu)](http://aws.amazon.com/marketplace/pp/prodview-yqgciytgjosfw)
+* Release of Vivado/Vitis 2025.1 Tools on [FPGA Developer AMI 1.18.0 (Ubuntu)](http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq)
 * Introduced [MSI-X PCIe Interrupts Guided Example](./sdk/apps/msix-interrupts/README.md)
 * Added [Loopback performance test for CL_SDE](./hdk/cl/examples/cl_sde/software/src/README.md)
 * [ReadTheDocs navigation improvements](https://awsdocs-fpga-f2.readthedocs-hosted.com/latest/)
