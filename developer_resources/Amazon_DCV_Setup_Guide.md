@@ -102,8 +102,6 @@ Enter the password you set in [Post-Installation Checks](#post-installation-chec
 
 At this point, you should see your session begin and a virtual desktop displayed after a brief delay.
 
-Any popups about not having a license may be safely ignored. This is a known issue with DCV.
-
 Now, open a terminal and run the following command: `source /etc/profile.d/default_module.sh`. You're now ready to use your GUI-enabled EC2 Instance.
 
 ``` bash

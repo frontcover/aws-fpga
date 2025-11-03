@@ -29,10 +29,14 @@ foreach f [glob -directory ${design_dir} *.{v,sv,vh,svh,inc}] {
   file copy -force $f ${src_post_enc_dir}/
 }
 
+# Make sure files have write permissions for the encryption
 exec chmod +w {*}[glob ${src_post_enc_dir}/*]
 
-# encrypt .v/.sv/.vh/inc as verilog files
-encrypt -k ${HDK_SHELL_DIR}/build/scripts/vivado_keyfile.txt -lang verilog [glob -nocomplain -- ${src_post_enc_dir}/*.{v,sv,vh,inc}]
-
-# encrypt *vhdl files
-encrypt -k ${HDK_SHELL_DIR}/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl -quiet [ glob -nocomplain -- ${src_post_enc_dir}/*.vhd? ]
+# Optional encryption
+if {$ENCRYPT} {
+  print "Encryption enabled. Encrypting HDL files and DCPs."
+  encrypt -k ${HDK_SHELL_DIR}/build/scripts/vivado_keyfile.txt      -lang verilog -quiet [glob -nocomplain -- ${src_post_enc_dir}/*.{v,sv,vh,inc}]
+  encrypt -k ${HDK_SHELL_DIR}/build/scripts/vivado_vhdl_keyfile.txt -lang vhdl    -quiet [glob -nocomplain -- ${src_post_enc_dir}/*.vhd?]
+} else {
+  print "Encryption disabled."
+}

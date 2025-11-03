@@ -32,7 +32,7 @@
     - [/verif](#verif)
     - [/ip](#ip)
     - [/lib](#lib)
-  - [Getting Started](#getting-started-1)
+  - [Next Steps](#next-steps)
 
 ## HDK Overview
 
@@ -111,6 +111,7 @@ A few more notes on [aws_build_dcp_from_cl.py](https://github.com/aws/aws-fpga/b
 - Use `--mode small_shell` option to build CL designs with Small Shell.
 - Use `--cl <CL name>` option to build a different CL design. This is default to `cl_dram_hbm_dma`.
 - Use `--aws_clk_gen` option to annotate the use of [AWS clock generation block](./hdk/docs/AWS_CLK_GEN_spec.md) and [customer clock recipes](./docs/Clock_Recipes_User_Guide.md).
+- Use `--no-encrypt` option to disable encryption of the design's source code and DCPs. Encryption, enabled by default, may impede debugging as errors from encrypted envelope do not provide meaningful information.
 - The script also allows developers to pass different Vivado directives as shown below:
   - `--place <directive>`: Default to `SSI_SpreadLogic_high` placement strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Available-Directives) for supported directives.
   - `--phy_opt <directive>` : Default to `AggressiveExplore` physical optimization strategy. Please refer to [Vivado User Guide](https://docs.amd.com/r/en-US/ug904-vivado-implementation/Using-Directives?tocId=9xJiGeSV35ApxUsX7pAVDg) for supported directives
@@ -279,7 +280,7 @@ Customers can customize the PCIe IDs for generated AFIs, including Vendor ID (VI
 `define CL_SH_ID1       32'h1D51_FEDC
 ```
 
-When a DCP tarball file gets generated, the IDs are included in the manifest file within the tarball:
+When a DCP tarball file gets generated, the IDs are included in the [manifest file](./docs/AFI_Manifest.md) within the tarball:
 
 ```bash
 pci_device_id=0xF002
@@ -457,9 +458,10 @@ The [lib directory](./common/lib) includes basic "library" elements that may be 
 - sync.v - Synchronizer
 - xpm_fifo.sv - Synchronous clock FIFO
 
-## Getting Started
+## Next Steps
 
-* Review the [cl_dram_hbm_dma](./cl/examples/cl_dram_hbm_dma/README.md) and [cl_sde](./cl/examples/cl_sde) examples
-* [Run RTL Simulations](./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md) on the example designs
-* Dive deep into [Shell interface specifications](./docs/AWS_Shell_Interface_Specification.md) and [PCIe Memory map](./docs/AWS_Fpga_Pcie_Memory_Map.md)
-* Create your own designs/Port F1 designs to F2 systems.
+- Review the [cl_dram_hbm_dma](./cl/examples/cl_dram_hbm_dma/README.md) and [cl_sde](./cl/examples/cl_sde) examples
+- [Run RTL Simulations](./docs/RTL_Simulation_Guide_for_HDK_Design_Flow.md) on the example designs
+- Dive deep into [Shell interface specifications](./docs/AWS_Shell_Interface_Specification.md) and [PCIe Memory map](./docs/AWS_Fpga_Pcie_Memory_Map.md)
+- Create your own designs/Port F1 designs to F2 systems.
+- (Optional) After creating your accelerator design, [create your own runtime AMI](../developer_resources/runtime_ami_builder/README.md)

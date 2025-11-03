@@ -63,7 +63,12 @@ def install_dpdk_dep():
         cmd_exec("sudo yum -y install numactl-devel.x86_64")
         cmd_exec("sudo yum -y install libpcap-devel")
         cmd_exec("sudo yum -y install meson")
-        cmd_exec("sudo yum -y install python3-pyelftools")
+        if installed_distro == "Amazon Linux":
+            cmd_exec ("pip3 install pyelftools")
+        else:
+            # Rocky Linux supported here
+            cmd_exec("sudo dnf -y install epel-release")
+            cmd_exec("sudo dnf -y install python3-pyelftools")
 
 def install_dpdk(install_path):
     logger.debug("install_dpdk: install_path=%s" % (install_path))

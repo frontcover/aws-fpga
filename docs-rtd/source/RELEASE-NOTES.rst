@@ -1,6 +1,26 @@
 F2 Developer Kit Release Notes
 ==============================
 
+.. _v222:
+
+v2.2.2
+------
+
+- Introducing the AWS EC2 F2 Runtime AMI Builder (RAB)
+
+  - The RAB is a customizable and extensible tool based on `the AWS CDK <https://docs.aws.amazon.com/cdk/v2/guide/home.html>`__ that easily automates building production-ready AMIs tailored to each accelerator application's needs
+  - `To get started building a runtime AMI, see the README here <./developer-resources/runtime-ami-builder/README.html>`__
+  - Default components are provided to modularly install specific features such as Vivado Lab Edition, the AWS CLI, the AWS FPGA SDK, and more
+  - `To learn how to integrate the RAB into existing AWS CDK flows, see the code example here <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/exampleLibraryUsage.ts>`__
+
+- `Updated Rocky FPGA Developer AMI <https://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__ name and description to match Marketplace info
+
+- Added F2 `AFI Manifest specification <./hdk/docs/AFI-Manifest.html>`__ for the version number, ID, and clock parameters
+- Added new ``--no-encrypt`` build option to the HDK flow to facilitate source code debugging
+- Updated `fpga_clkgen_util <https://github.com/aws/aws-fpga/blob/f2/sdk/userspace/fpga_libs/fpga_clkgen/fpga_clkgen_utils.c>`__ and `sde_examples <./hdk/cl/examples/cl-sde/software/src/README.html>`__ with better error handling procedures, addressing stability issues found on Rocky Linux.
+
+.. _v221:
+
 v2.2.1
 ------
 

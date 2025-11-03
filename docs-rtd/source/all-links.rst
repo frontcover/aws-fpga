@@ -114,6 +114,14 @@ Vitis
 
   vitis/README
 
+Runtime AMI Builder
+-------------------
+
+.. toctree::
+  :maxdepth: 1
+
+  developer-resources/runtime-ami-builder/README
+
 Release Notes and Errata
 ------------------------
 

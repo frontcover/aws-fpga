@@ -145,3 +145,12 @@ docs-rtd/build/*
 *.tmp
 **/example_projects/
 *.pb
+
+# Runtime AMI BUilder
+developer_resources/runtime_ami_builder/.DS_Store
+developer_resources/runtime_ami_builder/.eslintcache
+developer_resources/runtime_ami_builder/build
+developer_resources/runtime_ami_builder/dist/
+developer_resources/runtime_ami_builder/node_modules
+developer_resources/runtime_ami_builder/.idea
+developer_resources/runtime_ami_builder/cdk.out

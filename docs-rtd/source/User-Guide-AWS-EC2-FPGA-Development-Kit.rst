@@ -410,7 +410,7 @@ currently released to customers:
     - Vivado/Vitis Version Supported
     - Operating System Version
   * - 1.18.0
-    - `ami-04b57de2833b499b1 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
+    - `ami-0cb1b6ae2ff99f8bf <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
     - 2025.1
     - Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)
   * - 1.18.0
@@ -432,6 +432,15 @@ types <https://aws.amazon.com/ec2/instance-types/general-purpose/>`__.
 
 Note that the tools used by the HDK are only supported on x86-based EC2
 instances (Graviton-based instances are not compatible with the tools).
+
+For long-term cost savings when evaluating or debugging an accelerator
+in hardware, we recommend
+`creating a runtime AMI using the
+Runtime AMI Builder (RAB) <./developer-resources/runtime-ami-builder/README.html>`__.
+The RAB is a customizable and extensible tool based on
+`the AWS CDK <https://docs.aws.amazon.com/cdk/v2/guide/home.html>`__
+that easily automates building production-ready AMIs tailored to each accelerator application's needs.
+
 
 .. _getting-familiar-with-aws:
 
