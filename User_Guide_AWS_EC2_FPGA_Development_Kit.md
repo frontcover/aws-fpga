@@ -217,13 +217,16 @@ A free-to-use FPGA developer AMI is available for on-cloud F2 development with A
 
 | FPGA Developer AMI Version | FPGA Developer AMI ID (us-east-1) | Vivado/Vitis Version Supported | Operating System Version    |
 |----------------------------|-----------------------------------|--------------------------------|-----------------------------|
-| 1.18.0                     | [ami-04b57de2833b499b1](http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu) | 2025.1 | Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)|
+| 1.18.0                     | [ami-0cb1b6ae2ff99f8bf](http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu) | 2025.1 | Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)|
 | 1.18.0                     | [ami-098b2ed4c92602975](http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq) | 2025.1 | Ubuntu 24.04 (kernel 6.8.0-1021-aws)|
 | 1.16.1                     | [ami-092fc5deb8f3c0f7d](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) | 2024.1 | Ubuntu 20.04.6 (kernel 5.15)|
 
 Given the large size of the FPGA used for F2, AMD tools work best with at least 4 vCPU’s and 32GiB Memory. We recommend [Compute Optimized and Memory Optimized instance types](https://aws.amazon.com/ec2/instance-types/) to successfully run the synthesis of acceleration code. Developers may start coding and run simulations on low-cost `General Purpose` [instances types](https://aws.amazon.com/ec2/instance-types/).
 
 Note that the tools used by the HDK are only supported on x86-based EC2 instances (Graviton-based instances are not compatible with the tools).
+
+For long-term cost savings when evaluating or debugging an accelerator in hardware, we recommend [creating a runtime AMI using the Runtime AMI Builder (RAB)](./developer_resources/runtime_ami_builder/README.md).
+The RAB is a customizable and extensible tool based on [the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/home.html) that easily automates building production-ready AMIs tailored to each accelerator application's needs.
 
 ### Getting Familiar with AWS
 

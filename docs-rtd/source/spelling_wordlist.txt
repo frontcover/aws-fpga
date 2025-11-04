@@ -288,3 +288,12 @@ xdc
 impl
 pnr
 floorplanning
+dropdown
+js
+npm
+configs
+Versioning
+versioning
+xilinx
+customizable
+modularly

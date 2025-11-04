@@ -482,6 +482,7 @@ def main():
     checker.check_files(rst_files)
     checker.print_summary()
     assert checker.total_errors == 0, "Broken links found!"
+    logger.info("NO ISSUES DETECTED!")
 
 
 if __name__ == "__main__":

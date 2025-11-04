@@ -224,6 +224,12 @@ def main():
                             NOTE: Certain build flows might require a existing " +
                            "build tag.")
 
+    parser.add_option("--no-encrypt",
+                      dest="encrypt",
+                      action="store_false",
+                      help="Disable source code and DCP encryption.",
+                      default=True)
+
     (options, args) = parser.parse_args()
 
     print(f"==================================================")
@@ -276,6 +282,7 @@ def main():
     os.environ['CL'] = options.cl
     os.environ['SHELL_MODE'] = options.mode
     os.environ['BUILD_FLOW'] = options.flow
+    os.environ['ENCRYPT'] = str(int(options.encrypt))
 
     # Create a timestamp if no user tag is assgined
     if (options.build_tag):

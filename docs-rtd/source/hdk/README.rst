@@ -188,6 +188,7 @@ A few more notes on
 - Use ``--cl <CL name>`` option to build a different CL design. This is
   default to ``cl_dram_hbm_dma``.
 - Use ``--aws_clk_gen`` option to annotate the use of the `AWS_CLK_GEN IP <./docs/AWS-CLK-GEN-spec.html>`__ and the `Clock Recipes User Guide <./docs/Clock-Recipes-User-Guide.html>`__.
+- Use ``--no-encrypt`` option to disable encryption of the design's source code and DCPs. Encryption, enabled by default, may impede debugging as errors from encrypted envelope do not provide meaningful information.
 - The script also allows developers to pass different Vivado directives
   as shown below:
 
@@ -819,6 +820,7 @@ Next Steps
   <./docs/AWS-Shell-Interface-Specification.html>`__ and `PCIe Memory Map
   <./docs/AWS-Fpga-Pcie-Memory-Map.html>`__
 - Create your own CL designs or port F1 designs over to F2 systems
+- After creating your accelerator design, `create your own runtime AMI <../developer-resources/runtime-ami-builder/README.html>`__
 
 Additional HDK Documentation
 ----------------------------
@@ -834,6 +836,7 @@ Additional HDK Documentation
   docs/AWS-Fpga-Pcie-Memory-Map
   docs/RTL-Simulation-Guide-for-HDK-Design-Flow
   docs/List-AFI-on-Marketplace
+  docs/AFI-Manifest
   docs/on-premise-licensing-help
   docs/Supported-DDR-Modes
   docs/Virtual-JTAG-XVC

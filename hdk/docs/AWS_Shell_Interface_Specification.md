@@ -216,7 +216,7 @@ Please refer to the [Clock_Recipes_User_Guide.md](./Clock_Recipes_User_Guide.md)
 Similar to F1, the `clk_main_a0` in F2 also supports multiple clock recipes and the frequency can be scaled using SW APIs at the time of AFI loads (this feature is currently not available and will be added in a future
 release).
 
-#### Reset
+#### CL Reset
 
 The shell provides an active-low reset signal synchronous to clk_main_a0: rst_main_n.  This is an active low reset signal, and combines the board reset and PCIe link-level reset conditions.
 
@@ -458,7 +458,7 @@ There are some miscellaneous generic signals between the Shell and CL.
 
 The 64-bit ch_sh_id0/id1 are used by AWS to validate the signature of the DCP while being loaded into an FPGA in AWS.
 
-Initial versions of the HDK and Shell used the 4-tuple: PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID (which are used during AFI registration via `aws ec2 create-fpga-image` API) as the Integrity check mechanism, following the next mapping
+Initial versions of the HDK and Shell used the 4-tuple: PCIe VendorID, DeviceID, SubsystemVendorID and SubsystemID (which are used during AFI registration via `aws ec2 create-fpga-image` API consuming the [AWS AFI manifest](./AFI_Manifest.md)) as the integrity check mechanism, following the next mapping
 
 - cl_sh_id0
   - \[15:0\] – Vendor ID
@@ -559,7 +559,7 @@ foreach gtp [get_timing_paths -max_paths 5000 ?nworst 100 -filter {LOGIC_LEVELS 
     [get_propert LOGIC_LEVELS $gtp]"
 ```
 
-### Reset
+### Logic Reset
 
 Reset fanout can be minimized in an FPGA. This helps with routing congestion. Flops can be initialized in their declaration and generally do not require resets:
 
