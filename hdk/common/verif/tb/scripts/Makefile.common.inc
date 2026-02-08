@@ -138,7 +138,7 @@ endif
 
 #
 # COMMON_LIBLISTS FROM IP
-# 
+#
 include $(HDK_COMMON_DIR)/ip/cl_ip/common_liblists.mk
 
 LIBLISTS_ARGS = $(shell echo " $(strip $(COMMON_LIBLISTS))" | sed 's|\ | -L |g')
@@ -207,7 +207,11 @@ ifeq ("$(SIMULATOR)","xsim")
 else
 ifeq ("$(wildcard $(COMPLIB_DIR))","")
 	mkdir -p $(SIM_ROOT)
-	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -no_systemc_compile -library all -family  all" > create_libs.tcl
+	cd $(SIM_ROOT) && echo "# Pass 1: Compile all libraries (some may fail due to dependencies)" > create_libs.tcl
+	cd $(SIM_ROOT) && echo "catch {compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -no_systemc_compile -library all -family all}" >> create_libs.tcl
+	cd $(SIM_ROOT) && echo "" >> create_libs.tcl
+	cd $(SIM_ROOT) && echo "# Pass 2: Compile all libraries (previously failed libs now succeed)" >> create_libs.tcl
+	cd $(SIM_ROOT) && echo "compile_simlib -language all -dir $(COMPLIB_DIR) -simulator $(SIMULATOR) -no_systemc_compile -library all -family all" >> create_libs.tcl
 	cd $(SIM_ROOT) && vivado -mode batch -source create_libs.tcl
 	cd $(SIM_ROOT) && rm -rf create_libs.tcl
 endif
@@ -292,5 +296,4 @@ log_regression_results:
 print_regression_results:
 	echo "" ; \
 	echo "*** SEE RESULTS IN '$(REGRESSION_RESULTS_LOG)'" ; \
-	cat $(REGRESSION_RESULTS_LOG) ; 
-   
+	cat $(REGRESSION_RESULTS_LOG) ;

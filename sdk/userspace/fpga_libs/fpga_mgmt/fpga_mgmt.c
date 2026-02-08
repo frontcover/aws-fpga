@@ -289,7 +289,7 @@ static const char * long_help_FPGA_ERR_SOFTWARE_PROBLEM =
 	"the customer is using the library directly.\n";
 
 static const char * long_help_FPGA_ERR_UNRESPONSIVE =
-	"The FPGA or PCI subsytem is not responding. This can happen if the FPGA\n"
+	"The FPGA or PCI subsystem is not responding. This can happen if the FPGA\n"
 	"stopped behaving correctly and the instance will need to be stopped and\n"
 	"restarted.\n";
 

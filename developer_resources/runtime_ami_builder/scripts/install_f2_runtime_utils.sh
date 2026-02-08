@@ -59,8 +59,6 @@ ubuntu_utils_to_install=(
     build-essential
     devmem2
     dkms
-    linux-image-generic
-    linux-headers-generic
     libjpeg-turbo8-dev
     libopencv-dev
     libpng-dev
@@ -77,6 +75,7 @@ ubuntu_utils_to_install=(
     ocl-icd-libopencl1
     ocl-icd-opencl-dev
     opencl-headers
+    python3.12-venv
     screen
     tcl-dev
 )

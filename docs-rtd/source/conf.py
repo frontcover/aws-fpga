@@ -46,19 +46,6 @@ extensions = [
 
 # Makes the spelling filters visible.
 sys.path.insert(0, os.path.abspath("./spelling_filters"))
-from hex_filter import HexFilter
-from ordinal_filter import OrdinalFilter
-from rtl_hex_filter import RTLHexFilter
-from username_filter import UsernameFilter
-
-spelling_ignore_acronyms = True
-spelling_filters = [
-    "hex_filter.HexFilter",
-    "rtl_hex_filter.RTLHexFilter",
-    "ordinal_filter.OrdinalFilter",
-    "username_filter.UsernameFilter",
-]
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

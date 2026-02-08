@@ -7,7 +7,7 @@ Design Checkpoint (DCP) and a mandatory ``manifest.txt`` file.
 
 This document is a purely informative specification for the
 ``manifest.txt`` file formatted with key=value pairs. Developers should
-never manually modify the manifest as it's automatically created by the
+never manually modify the manifest as it’s automatically created by the
 AWS build scripts.
 
 Manifest file specification: Version 2
@@ -37,25 +37,25 @@ Manifest file specification: Version 2
   - *Must be non-zero - For more information, see* `AFI PCIe
     IDs <./../README.html#afi-pcie-ids>`__
 
-- **dcp_hash=**.....
+- **dcp_hash=**\ …..
 
   - *Includes the sha256sum value of the submitted Design Checkpoint
     (DCP)*
 
-- **shell_version=**.....
+- **shell_version=**\ …..
 
   - *Taken from*
     `aws-fpga/hdk/common/shell_stable/shell_version.txt <https://github.com/aws/aws-fpga/tree/f2/hdk/common/shell_stable/shell_version.txt>`__
 
-- **dcp_file_name=**.....
+- **dcp_file_name=**\ …..
 
   - *The .dcp file name including the file type suffix*
 
-- **hdk_version=**.....
+- **hdk_version=**\ …..
 
   - *Taken from aws-fpga/release_version.txt*
 
-- **tool_version=**.....
+- **tool_version=**\ …..
 
   - *Use the vivado tool version used (from the*
     `supported_vivado_versions.txt <https://github.com/aws/aws-fpga/tree/f2/supported_vivado_versions.txt>`__\ *).
@@ -67,22 +67,24 @@ Manifest file specification: Version 2
   - *Following same format used in the automatic build reports used by
     AWS scripts*
 
-- **clock_recipe_a=**....
+- **clock_recipe_a=**\ ….
 
   - *Deprecated, please refer to the* `AWS Clock Recipes User
     Guide <./Clock-Recipes-User-Guide.html>`__
 
-- **clock_recipe_b=**....
+- **clock_recipe_b=**\ ….
 
   - *Deprecated, please refer to the* `AWS Clock Recipes User
     Guide <./Clock-Recipes-User-Guide.html>`__
 
-- **clock_recipe_c=**....
+- **clock_recipe_c=**\ ….
 
   - *Deprecated, please refer to the* `AWS Clock Recipes User
     Guide <./Clock-Recipes-User-Guide.html>`__
 
-- **clock_recipe_hbm=**....
+- **clock_recipe_hbm=**\ ….
 
   - *Deprecated, please refer to the* `AWS Clock Recipes User
     Guide <./Clock-Recipes-User-Guide.html>`__
+
+`Back to Home <../../index.html>`__

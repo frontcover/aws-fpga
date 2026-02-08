@@ -26,11 +26,6 @@ export class RuntimeAmiBuilderStack extends Stack {
     const baseAmi = BASE_AMI_CONFIGS[Stack.of(this).node.tryGetContext('ami-builder:base-image') as keyof typeof BASE_AMI_CONFIGS];
     const user = baseAmi.user;
     const components: { componentArn: string }[] = [];
-    if (user === BASE_AMI_CONFIGS.ROCKY_8_10.user) {
-      components.push({
-        componentArn: createComponent(this, COMPONENTS.updateRockyPython(user)).attrArn
-      });
-    }
     const rootVolume = {
       deviceName: '/dev/sda1',
       volume: BlockDeviceVolume.ebs(
@@ -44,11 +39,12 @@ export class RuntimeAmiBuilderStack extends Stack {
     };
     const vivadoToolVersion = Stack.of(this).node.tryGetContext('ami-builder:vivado-version')
     const componentConfigs = [
-      COMPONENTS.installAwsCli(user),
       COMPONENTS.prepareForAmiBuild(user),
+      ...(user === BASE_AMI_CONFIGS.ROCKY_8_10.user ? [COMPONENTS.updateRockyPython(user)] : []),
+      COMPONENTS.installAwsCli(user),
       COMPONENTS.displayStorage([rootVolume]),
-      COMPONENTS.installAwsFpgaSdk(user),
       COMPONENTS.installF2RuntimeUtils(user),
+      COMPONENTS.installAwsFpgaSdk(user),
       COMPONENTS.installVivadoLabEdition(user, vivadoToolVersion),
       COMPONENTS.installXilinxVirtualCable(user, vivadoToolVersion),
       COMPONENTS.cleanupStage(user)
@@ -182,10 +178,10 @@ if (!Object.values(VivadoLabEditionVersion).includes(vivadoLabEditionVersion)) {
 }
 
 if (baseImage === "UBUNTU_24_04" && rootVolumeSize < 14) {
-  throw new Error(`Ubuntu 24.04 requires >= 14GiB of root volume capacity! Capcity specified: ${rootVolumeSize}`);
+  throw new Error(`Ubuntu 24.04 requires >= 14GiB of root volume capacity! Capacity specified: ${rootVolumeSize}`);
 }
 if (baseImage === "ROCKY_8_10" && rootVolumeSize < 12) {
-  throw new Error(`Rocky Linux 8.10 requires >= 12GiB of root volume capacity! Capcity specified: ${rootVolumeSize}`);
+  throw new Error(`Rocky Linux 8.10 requires >= 12GiB of root volume capacity! Capacity specified: ${rootVolumeSize}`);
 }
 if (!(Object.values(EbsDeviceVolumeType).includes(rootVolumeType))) {
   throw new Error(`Invalid root volume type: '${rootVolumeType}'`);

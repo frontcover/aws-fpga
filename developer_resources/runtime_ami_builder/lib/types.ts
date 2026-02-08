@@ -2,6 +2,8 @@ import {
   MachineImage,
   IMachineImage,
 } from 'aws-cdk-lib/aws-ec2';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface BaseImageConfig {
   machineImage: IMachineImage;
@@ -15,18 +17,20 @@ export interface AmiMetadata {
   tags: Record<string, string>;
 }
 
-export const BASE_AMI_CONFIGS = {
-  ROCKY_8_10: {
-    amiId: "ami-05a3890358c102c97",
-    user: "rocky",
-    description: "Rocky Linux 8.10"
-  },
-  UBUNTU_24_04: {
-    amiId: "ami-040466f9e4eadfea8",
-    user: "ubuntu",
-    description: "Ubuntu 24.04 LTS"
-  }
-} as const;
+interface SourceAmiConfig {
+  amiId: string;
+  user: string;
+  description: string;
+}
+
+// Load source AMI configurations from JSON file
+const sourceAmisPath = path.join(__dirname, 'source_amis.json');
+const sourceAmisData = JSON.parse(fs.readFileSync(sourceAmisPath, 'utf-8')) as Record<string, SourceAmiConfig>;
+
+export const BASE_AMI_CONFIGS = sourceAmisData as {
+  readonly ROCKY_8_10: SourceAmiConfig;
+  readonly UBUNTU_24_04: SourceAmiConfig;
+};
 
 export enum VivadoLabEditionVersion {
   V2025_1 = '2025.1',

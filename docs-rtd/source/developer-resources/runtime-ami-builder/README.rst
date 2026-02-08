@@ -3,7 +3,7 @@ AWS EC2 F2 FPGA Runtime AMI Builder
 
 After creating an Amazon FPGA Image (AFI), we suggest creating a runtime
 AMI using the Runtime AMI Builder (RAB). This tool was created to design
-an AMI to pair with specific accelerated application's needs. Use of the
+an AMI to pair with specific accelerated application’s needs. Use of the
 RAB offers the following benefits:
 
 - **Reduced storage costs**
@@ -12,7 +12,7 @@ RAB offers the following benefits:
 
 - **A Production-ready environment**
 
-  - Install only what's needed to run a production accelerator design
+  - Install only what’s needed to run a production accelerator design
     and host application
 
 - **Flexibility and Extensibility**
@@ -43,14 +43,9 @@ Table of Contents
 - `What is the AWS CDK? <#what-is-the-aws-cdk>`__
 - `What Does Using the Runtime AMI Builder
   Cost? <#what-does-using-the-runtime-ami-builder-cost>`__
-- `Running Individual Installation Scripts Locally
-  <#running-individual-installation-scripts-locally>`__
-- `AWS Account IAM Role Setup for Runtime AMI Builder
-  Use <#aws-account-iam-role-setup-for-runtime-ami-builder-use>`__
-
-  - `Using the Runtime AMI Builder IAM
-    Role <#using-the-runtime-ami-builder-iam-role>`__
-
+- `Running Individual Installation Scripts
+  Locally <#running-individual-installation-scripts-locally>`__
+- `AWS Account IAM Role Setup <#aws-account-iam-role-setup>`__
 - `Installing Node.js <#installing-nodejs>`__
 - `Installing AWS CDK Dependencies <#installing-aws-cdk-dependencies>`__
 - `Customizing the Runtime AMI
@@ -98,9 +93,9 @@ a framework for defining cloud infrastructure as code through familiar
 programming languages. No prior knowledge about the CDK is needed to use
 this tool, but a basic understanding of these concepts will help:
 
-- **CDK** converts the RAB's TypeScript code into AWS CloudFormation
+- **CDK** converts the RAB’s TypeScript code into AWS CloudFormation
   templates
-- **CloudFormation** is AWS's service for creating and managing cloud
+- **CloudFormation** is AWS’s service for creating and managing cloud
   resources
 - **Bootstrapping** sets up the necessary CDK infrastructure in the
   deploying AWS account (one-time setup)
@@ -131,14 +126,13 @@ or deploy.
 Running Individual Installation Scripts Locally
 -----------------------------------------------
 
-Before cloning the FPGA Developer Kit onto either base AMI,
-install ``git``. After the FPGA Developer Kit is cloned onto
-the base AMI, the installation scripts used by the RAB may
-be executed individually on the base AMI. This is greatly
-reduces iteration time before setting up an EC2 Image
-Builder pipeline. If all components are being installed via
-local execution of the installer scripts, they must be run
-in this order to satisfy tool and package dependencies:
+Before cloning the FPGA Developer Kit onto either base AMI, install
+``git``. After the FPGA Developer Kit is cloned onto the base AMI, the
+installation scripts used by the RAB may be executed individually on the
+base AMI. This is greatly reduces iteration time before setting up an
+EC2 Image Builder pipeline. If all components are being installed via
+local execution of the installer scripts, they must be run in this order
+to satisfy tool and package dependencies:
 
 1. `install_script_execution_essentials.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/install_script_execution_essentials.sh>`__
 2. `update_rocky_python.sh <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/scripts/update_rocky_python.sh>`__
@@ -150,125 +144,27 @@ in this order to satisfy tool and package dependencies:
 
 Refer to each script to see any necessary flags and arguments.
 
-  install_xilinx_virtual_cable.sh emits an error if ran on a compute instance.
-  If "XVC PCIe driver installation complete!" is emitted when ran,
-  this error can be ignored.
+   install_xilinx_virtual_cable.sh emits an error if ran on a compute
+   instance. If “XVC PCIe driver installation complete!” is emitted when
+   ran, this error can be ignored.
 
-AWS Account IAM Role Setup for Runtime AMI Builder Use
-------------------------------------------------------
+AWS Account IAM Role Setup
+--------------------------
 
-The RAB requires access to an AWS account's resources via an IAM role.
-To create an IAM role with the necessary permissions, follow these
-steps:
+.. toctree::
+   :maxdepth: 1
+   :hidden:
 
-1. In a browser, navigate to the AWS EC2 Console
+   ../Setting-up-IAM-roles-for-devkit-use
 
-2. In the search bar, search for "IAM" and click on it in the search
-   results
+The RAB requires access to an AWS account’s resources via an IAM role.
+See `Setting Up IAM Roles for Use with the AWS EC2 FPGA Development
+Kit <../Setting-up-IAM-roles-for-devkit-use.html#runtime-ami-builder-permissions>`__
+for detailed instructions on creating and attaching the required IAM
+role.
 
-   |Search Results|
-
-3. On the IAM console, click "Roles" on the left side of the console
-
-   |Roles|
-
-4. On the Roles screen, click "Create role" in the top right corner of
-   the console
-
-   |Create Role|
-
-5. Under "Select trusted entity", select "AWS service" as the "Trusted
-   entity type"
-
-6. Under "Use case" select "EC2"
-
-7. On the choice selection that appears, use "EC2"
-
-   |Select Trusted Entity|
-
-8. Click the "Next" button
-
-9. On the "Add permissions" screen, add the following **managed
-   policies**:
-
-   - AmazonS3FullAccess
-   - AmazonSSMReadOnlyAccess
-   - AWSCloudFormationFullAccess
-   - AWSImageBuilderFullAccess
-
-..
-
-   ⚠️ **Security Best Practice**: These managed policies grant broad
-   permissions for ease of setup. After becoming comfortable with the
-   RAB, we recommend creating custom policies that limit access to
-   specific resources (e.g., only the CDK bootstrap bucket for S3, only
-   RuntimeAMI\* resources for Image Builder). See `AWS IAM Best
-   Practices <https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html>`__
-   for guidance on implementing least-privilege access.
-
-10. Under "Name, review, create", give the role a name and description
-    that associates it with building runtime AMIs
-11. In the "Step 1: Select trusted entities" form, no edits are
-    necessary when using the permissions above
-
-|Mon AMI|
-
-12. Now click "Create role"
-13. Search for the newly created role in the IAM console and open its
-    details page
-14. Click the "Add permissions" dropdown and select "Create inline
-    policy"
-
-|Inline Policy|
-
-15. In the JSON editor, paste the policy below and give it an
-    identifiable name, then click "Next"
-
-.. code:: json
-
-   {
-     "Version": "2012-10-17",
-     "Statement": [
-       {
-         "Effect": "Allow",
-         "Action": [
-           "iam:PassRole",
-           "iam:GetRole"
-         ],
-         "Resource": [
-           "arn:aws:iam::*:role/cdk-hnb659fds-*",
-           "arn:aws:iam::*:role/RuntimeAMIBuilderStack-*"
-         ]
-       }
-     ]
-   }
-
-|Role Pass|
-
-16. Finally, verify the created role by checking that it has the 4
-    permissions and another based on the policy above
-
-Using the Runtime AMI Builder IAM Role
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When running the RAB on an AWS EC2 Instance, make sure to attach the
-created IAM role under the "Advanced details" section in the Launch
-Instances interface.
-
-|IAM Attach|
-
-If the instance is already launched, the IAM role can be attached to it
-retroactively. On the EC2 Instances screen, select modify IAM role under
-Actions -> Security.
-
-|IAM Post Attach|
-
-At this point the RAB is ready to run after SSHing onto the instance.
-
-.. _installing-nodejs:
-
-Installing Node.js
-------------------
+Installing NodeJS
+-----------------
 
 The AWS CDK depends on ``Node.js`` to function. More information about
 `supported versions is available
@@ -286,7 +182,7 @@ After installing Node.js, source the setup script to install the CDK and
 its dependencies and perform any necessary security updates for those
 npm packages:
 
-.. code:: bash
+.. code-block:: bash
 
    cd $path_to_fpga_developer_kit/developer_resources/runtime_ami_builder
    . runtime_ami_builder_setup.sh
@@ -317,12 +213,12 @@ Two default base AMIs are available: ``Rocky Linux 8.10`` and
 ``Ubuntu 24.04``. The AMI configurations are defined in
 `lib/types.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/types.ts>`__ using their AMI IDs for ``us-east-1``.
 To add and use a different base AMI, modify ``BASE_AMI_CONFIGS`` in
-`lib/types.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/types.ts>`__ to include the new AMI's ID and
+`lib/types.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/types.ts>`__ to include the new AMI’s ID and
 configuration details. We recommend choosing an AMI without a product
 code attached to it. To find an AMI that without a product code, use the
 following command:
 
-.. code:: bash
+.. code-block:: bash
 
    aws ec2 describe-images --filters "Name=name, Values=*OS_NAME_GOES_HERE*" --query 'Images[].[ImageId,Name,CreationDate,ProductCodes[0].ProductCodeId || `null`]' --output table | grep None
 
@@ -342,8 +238,11 @@ must be incremented between changes to any of the files used by the RAB.
 Choosing a Vivado Lab Edition Tool Version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The two default base AMIs are supported by `Vivado Lab Edition 2025.1 <https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license/Supported-Operating-Systems>`__.
-Other supported versions will be listed in `supported_vivado_lab_edition_versions.txt <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/supported_vivado_lab_edition_versions.txt>`__ when they are added to the RAB.
+The two default base AMIs are supported by `Vivado Lab Edition
+2025.2 <https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license/Supported-Operating-Systems>`__.
+Other supported versions will be listed in
+`supported_vivado_lab_edition_versions.txt <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/supported_vivado_lab_edition_versions.txt>`__
+when they are added to the RAB.
 
 If Vivado Lab Edition is not required, remove the
 ``installVivadoLabEdition`` component from ``componentConfigs`` in
@@ -384,10 +283,10 @@ here <#what-does-using-the-runtime-ami-builder-cost>`__.
 Customizing AMI Info
 ~~~~~~~~~~~~~~~~~~~~
 
-The AMI's name, unique identifier, description, and tags may all be
+The AMI’s name, unique identifier, description, and tags may all be
 configured as well.
 
-   Spaces aren't allowed in the unique identifier field.
+   Spaces aren’t allowed in the unique identifier field.
 
 Selecting Components to Use in the Runtime AMI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -409,9 +308,10 @@ following commands should be run from within
 Bootstrap the CDK (First Deployment Only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-First, generate the CDK configuration from ``cdk.jsonc``. This can be done from anywhere within ``developer_resources/runtime_ami_builder``:
+First, generate the CDK configuration from ``cdk.jsonc``. This can be
+done from anywhere within ``developer_resources/runtime_ami_builder``:
 
-.. code:: bash
+.. code-block:: bash
 
    npx ts-node $RAB_DIR/scripts/buildConfig.ts
 
@@ -423,7 +323,7 @@ ensure the changes will take effect.
 
 Now the CDK can be bootstrapped:
 
-.. code:: bash
+.. code-block:: bash
 
    cdk bootstrap
 
@@ -443,14 +343,14 @@ Verify the Settings
 parameters, and distributions the runtime AMI will be built with and
 process.
 
-.. code:: bash
+.. code-block:: bash
 
    cdk synth
 
-It's especially useful for verifying that AMI launch permissions will be
+It’s especially useful for verifying that AMI launch permissions will be
 granted as expected:
 
-.. code:: yaml
+.. code-block:: yaml
 
      MyRuntimeAmiDistributionConfig:
        Type: AWS::ImageBuilder::DistributionConfiguration
@@ -485,7 +385,7 @@ is also being distributed to regions ``us-east-1`` and ``us-west-2``.
 Deploy the Image Builder Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: bash
+.. code-block:: bash
 
    cdk deploy
 
@@ -502,17 +402,17 @@ Running this command creates:
 Running the Image Builder Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once the deployment completes, retrieve the EC2 Image Builder pipeline's
+Once the deployment completes, retrieve the EC2 Image Builder pipeline’s
 ARN:
 
 1. Open the AWS EC2 Console in a browser
 2. In the search bar, type ``EC2 Image Builder`` and click on it
-3. Click on the link for the deployed pipeline's name
+3. Click on the link for the deployed pipeline’s name
 
 Next, use the ``Pipeline ARN`` on that page to run the pipeline from the
 CLI:
 
-.. code:: bash
+.. code-block:: bash
 
    $ aws imagebuilder start-image-pipeline-execution --image-pipeline-arn <image_builder_arn_from_image_pipelines_page_in_ec2_console>
    {
@@ -534,7 +434,7 @@ directly above, then do the following:
 
 The CloudWatch log stream may be inspected from the EC2 Image Builder
 pipeline visited in the steps above. This provides a near-real-time view
-of the runtime AMI build's progress, as well as any errors it may
+of the runtime AMI build’s progress, as well as any errors it may
 encounter. A successful runtime AMI build using all of the components
 mentioned in this guide takes ~45 minutes. Once the runtime AMI has been
 built successfully, it is available for immediate use by the deploying
@@ -546,7 +446,7 @@ Cleaning Up Resources
 To delete the CloudFormation stack, EC2 Image Builder pipeline, and all
 of its components, run:
 
-.. code:: bash
+.. code-block:: bash
 
    cdk destroy
 
@@ -562,12 +462,12 @@ or perform any other setup needed. The components are defined in the
 table called ``COMPONENTS`` in
 `lib/components.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/components.ts>`__. Each component has 3 parts:
 a ``name``, a ``header``, and ``cmds``. These are the only values needed
-to define a new component. Components' commands are able to use
-TypeScript's template strings to substitute variables into them.
+to define a new component. Components’ commands are able to use
+TypeScript’s template strings to substitute variables into them.
 
-A component's commands are executed as bash commands during the AMI
+A component’s commands are executed as bash commands during the AMI
 build. The EC2 Image Builder service may fail due to undefined variables
-when it's executing the Bash commands in a component. The EC2 Image
+when it’s executing the Bash commands in a component. The EC2 Image
 Builder service requires all variables to be defined before being
 accessed to ensure reliable and reproducible builds. This is why
 variables are explicitly defined in the included component definitions
@@ -596,18 +496,10 @@ Issues/Support
 FAQ
 ---
 
-- It looks like the XVC PCIe driver isn't there after being installed in
+- It looks like the XVC PCIe driver isn’t there after being installed in
   the pipeline. What should I do?
 
   - Run ``sudo modprobe xilinx_xvc_pci_driver`` to start the driver for
     the current session
 
-.. |Search Results| image:: ../../_static/runtime_ami_builder_images/iam_search.png
-.. |Roles| image:: ../../_static/runtime_ami_builder_images/roles_on_iam_page.png
-.. |Create Role| image:: ../../_static/runtime_ami_builder_images/create_role_button.png
-.. |Select Trusted Entity| image:: ../../_static/runtime_ami_builder_images/select_trusted_entity.png
-.. |Mon AMI| image:: ../../_static/runtime_ami_builder_images/name_review_create.png
-.. |Inline Policy| image:: ../../_static/runtime_ami_builder_images/create_inline_policy.png
-.. |Role Pass| image:: ../../_static/runtime_ami_builder_images/role_pass_policy.png
-.. |IAM Attach| image:: ../../_static/runtime_ami_builder_images/attach_iam_role_to_instance.png
-.. |IAM Post Attach| image:: ../../_static/runtime_ami_builder_images/attach_iam_role_post_launch.png
+`Back to Home <../../index.html>`__

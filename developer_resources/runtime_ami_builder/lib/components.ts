@@ -30,6 +30,7 @@ export const COMPONENTS = {
       `echo "Installing dependencies!"`,
       `sudo ${getPkgManager(user)} install -y git`,
       `sudo ${getPkgManager(user)} install -y wget`,
+      `sudo ${getPkgManager(user)} update -y`,
       user === BASE_AMI_CONFIGS.ROCKY_8_10.user
         ? `sudo dnf groupinstall -y "Development tools"`
         : "sudo apt install -y build-essential",

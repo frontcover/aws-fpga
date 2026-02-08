@@ -44,7 +44,7 @@ function vitis_help {
     info_msg "  (1) install FPGA Management Tools,"
     info_msg "  (2) check if Xilinx tools are available,"
     info_msg "  (3) check if required packages are installed,"
-    info_msg "  (4) Download lastest AWS platform,"
+    info_msg "  (4) Download latest AWS platform,"
     info_msg "  (5) Prepare environment to install runtime drivers "
     echo " "
     vitis_usage
@@ -70,6 +70,7 @@ declare -A valid_tool_versions
 valid_tool_versions["2024.1"]="true"
 valid_tool_versions["2024.2"]="true"
 valid_tool_versions["2025.1"]="true"
+valid_tool_versions["2025.2"]="true"
 
 declare -A valid_os
 valid_os["Ubuntu"]="true"
@@ -252,11 +253,13 @@ declare -A xsa_dir_map
 xsa_dir_map["2024.1"]="2024_1_2"
 xsa_dir_map["2024.2"]="2024_2"
 xsa_dir_map["2025.1"]="2024_2"
+xsa_dir_map["2025.2"]="2024_2"
 
 declare -A xsa_map
 xsa_map["2024.1"]="202410_1_2"
 xsa_map["2024.2"]="202420_1"
 xsa_map["2025.1"]="202420_2"
+xsa_map["2025.2"]="202420_2"
 
 
 function setup_xsa {
@@ -405,6 +408,7 @@ declare -A commit_hash_map
 commit_hash_map["2024.1"]="a0729c69dba1ec05856d3008fbf9994a665f276c"
 commit_hash_map["2024.2"]="d8cf77af92e92324b038d787773b78fb7a44f812"
 commit_hash_map["2025.1"]="db8c37afa751589e72f0c47436bf3daca444d45d"
+commit_hash_map["2025.2"]="74dec3c9c4f6dd9bfb62ae11e71ec96bcc4859eb"
 
 
 function set_up_xrt_vars {

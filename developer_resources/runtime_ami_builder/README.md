@@ -25,8 +25,7 @@ The RAB makes creating a runtime AMI for individual applications convenient by s
 - [What is the AWS CDK?](#what-is-the-aws-cdk)
 - [What Does Using the Runtime AMI Builder Cost?](#what-does-using-the-runtime-ami-builder-cost)
 - [Running Individual Installation Scripts Locally](#running-individual-installation-scripts-locally)
-- [AWS Account IAM Role Setup for Runtime AMI Builder Use](#aws-account-iam-role-setup-for-runtime-ami-builder-use)
-  - [Using the Runtime AMI Builder IAM Role](#using-the-runtime-ami-builder-iam-role)
+- [AWS Account IAM Role Setup](#aws-account-iam-role-setup)
 - [Installing Node.js](#installing-nodejs)
 - [Installing AWS CDK Dependencies](#installing-aws-cdk-dependencies)
 - [Customizing the Runtime AMI Build](#customizing-the-runtime-ami-build)
@@ -90,85 +89,10 @@ Refer to each script to see any necessary flags and arguments.
 > install_xilinx_virtual_cable.sh emits an error if ran on a compute instance.
 If "XVC PCIe driver installation complete!" is emitted when ran, this error can be ignored.
 
-## AWS Account IAM Role Setup for Runtime AMI Builder Use
+## AWS Account IAM Role Setup
 
-The RAB requires access to an AWS account's resources via an IAM role. To create an IAM role with the necessary permissions, follow these steps:
-
-1. In a browser, navigate to the AWS EC2 Console
-2. In the search bar, search for "IAM" and click on it in the search results
-
-   ![Search Results](../../docs-rtd/source/_static/runtime_ami_builder_images/iam_search.png)
-
-3. On the IAM console, click "Roles" on the left side of the console
-
-   ![Roles](../../docs-rtd/source/_static/runtime_ami_builder_images/roles_on_iam_page.png)
-
-4. On the Roles screen, click "Create role" in the top right corner of the console
-
-   ![Create Role](../../docs-rtd/source/_static/runtime_ami_builder_images/create_role_button.png)
-
-5. Under "Select trusted entity", select "AWS service" as the "Trusted entity type"
-6. Under "Use case" select "EC2"
-7. On the choice selection that appears, use "EC2"
-
-    ![Select Trusted Entity](../../docs-rtd/source/_static/runtime_ami_builder_images/select_trusted_entity.png)
-
-8. Click the "Next" button
-9. On the "Add permissions" screen, add the following **managed policies**:
-   - AmazonS3FullAccess
-   - AmazonSSMReadOnlyAccess
-   - AWSCloudFormationFullAccess
-   - AWSImageBuilderFullAccess
-
-> ⚠️ **Security Best Practice**: These managed policies grant broad permissions for ease of setup. After becoming comfortable with the RAB, we recommend creating custom policies that limit access to specific resources (e.g., only the CDK bootstrap bucket for S3, only RuntimeAMI* resources for Image Builder). See [AWS IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html) for guidance on implementing least-privilege access.
-
-10.   Under "Name, review, create", give the role a name and description that associates it with building runtime AMIs
-11.  In the "Step 1: Select trusted entities" form, no edits are necessary when using the permissions above
-
-  ![Mon AMI](../../docs-rtd/source/_static/runtime_ami_builder_images/name_review_create.png)
-
-12.  Now click "Create role"
-13.  Search for the newly created role in the IAM console and open its details page
-14.  Click the "Add permissions" dropdown and select "Create inline policy"
-
-  ![Inline Policy](../../docs-rtd/source/_static/runtime_ami_builder_images/create_inline_policy.png)
-
-15.   In the JSON editor, paste the policy below and give it an identifiable name, then click "Next"
-
-  ```json
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": [
-          "iam:PassRole",
-          "iam:GetRole"
-        ],
-        "Resource": [
-          "arn:aws:iam::*:role/cdk-hnb659fds-*",
-          "arn:aws:iam::*:role/RuntimeAMIBuilderStack-*"
-        ]
-      }
-    ]
-  }
-  ```
-
-  ![Role Pass](../../docs-rtd/source/_static/runtime_ami_builder_images/role_pass_policy.png)
-
-16. Finally, verify the created role by checking that it has the 4 permissions and another based on the policy above
-
-### Using the Runtime AMI Builder IAM Role
-
-When running the RAB on an AWS EC2 Instance, make sure to attach the created IAM role under the "Advanced details" section in the Launch Instances interface.
-
-  ![IAM Attach](../../docs-rtd/source/_static/runtime_ami_builder_images/attach_iam_role_to_instance.png)
-
-If the instance is already launched, the IAM role can be attached to it retroactively. On the EC2 Instances screen, select modify IAM role under Actions -> Security.
-
-  ![IAM Post Attach](../../docs-rtd/source/_static/runtime_ami_builder_images/attach_iam_role_post_launch.png)
-
-At this point the RAB is ready to run after SSHing onto the instance.
+The RAB requires access to an AWS account's resources via an IAM role.
+See [Setting Up IAM Roles for Use with the AWS EC2 FPGA Development Kit](../Setting_up_IAM_roles_for_devkit_use.md#runtime-ami-builder-permissions) for detailed instructions on creating and attaching the required IAM role.
 
 ## Installing NodeJS
 
@@ -213,7 +137,7 @@ Image recipe versioning, as the name suggests, provides version control over ima
 
 ### Choosing a Vivado Lab Edition Tool Version
 
-The two default base AMIs are supported by [Vivado Lab Edition 2025.1](https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license/Supported-Operating-Systems).
+The two default base AMIs are supported by [Vivado Lab Edition 2025.2](https://docs.amd.com/r/en-US/ug973-vivado-release-notes-install-license/Supported-Operating-Systems).
 Other supported versions will be listed in [supported_vivado_lab_edition_versions.txt](./supported_vivado_lab_edition_versions.txt) when they are added to the RAB.
 
 If Vivado Lab Edition is not required, remove the `installVivadoLabEdition` component from `componentConfigs` in [lib/runtimeAmiBuilder.ts](./lib/runtimeAmiBuilder.ts).
