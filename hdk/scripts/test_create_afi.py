@@ -37,7 +37,7 @@ from io import StringIO
 from unittest.mock import MagicMock, Mock, patch, mock_open, DEFAULT
 from typing import List, Tuple, Optional
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 from pydantic import ValidationError
 
 # Import the module under test
@@ -368,7 +368,7 @@ class TestS3Manager(unittest.TestCase):
         S3Manager(self.region).create_bucket(self.bucket_name)
         return S3Manager(self.region)
 
-    @mock_s3
+    @mock_aws
     def test_bucket_operations(self):
         self.s3_client = boto3.client("s3", region_name=self.region)
         s3_manager = S3Manager(self.region)
@@ -401,7 +401,7 @@ class TestS3Manager(unittest.TestCase):
         self.assertNotIn("west-bucket", buckets)
         self.assertNotIn("error-bucket", buckets)
 
-    @mock_s3
+    @mock_aws
     def test_folder_and_file_operations(self):
         s3_manager = self.setup_mock_bucket()
         folder_path = "test/folder"
@@ -424,7 +424,7 @@ class TestS3Manager(unittest.TestCase):
         finally:
             os.unlink(temp_file)
 
-    @mock_s3
+    @mock_aws
     @patch.object(UserInterface, "get_choice_from_options")
     @patch.object(UserInterface, "get_input")
     def test_interactive_operations(self, mock_input, mock_choice):
@@ -484,16 +484,21 @@ class TestAFICreator(unittest.TestCase):
         self.assertIsInstance(creator.s3_manager, S3Manager)
         self.assertIsInstance(creator.dcp_discovery, DCPDiscovery)
 
-    @patch.multiple("create_afi.AFICreator", _complete_afi_data=DEFAULT, _poll_afi_status=DEFAULT)
+    @patch.multiple("create_afi.AFICreator", _complete_afi_data=DEFAULT)
+    @patch("create_afi.wait_for_afi")
     @patch.multiple("os.path", getsize=DEFAULT)
     @patch("boto3.client")
     @patch("tarfile.open")
     @patch("create_afi.UserInterface.confirm")
-    def test_create_afi_workflow(self, mock_confirm, mock_tarfile, mock_client, **mocks):
+    @patch("create_afi.UserInterface.get_input")
+    def test_create_afi_workflow(
+        self, mock_get_input, mock_confirm, mock_tarfile, mock_client, mock_wait_for_afi, **mocks
+    ):
         # Setup basic mocks
         mock_tarfile.return_value.__enter__.return_value.getnames.return_value = ["test.dcp"]
         mocks["getsize"].return_value = 1024 * 1024
         mocks["_complete_afi_data"].return_value = {**self.mock_afi_data, "region": self.region}
+        mock_wait_for_afi.return_value = 0  # Success
 
         self.afi_creator.ec2_client = MagicMock()
         self.afi_creator.ec2_client.create_fpga_image.return_value = {
@@ -504,17 +509,18 @@ class TestAFICreator(unittest.TestCase):
         self.afi_creator.interactive = True
 
         # Test create_bucket and polling
-        mock_confirm.side_effect = [True, True]  # First call
-        result = self.afi_creator.create_afi({"name": "test"}, create_bucket=True, poll_interval=300)
+        mock_confirm.side_effect = [True, True, True]  # Confirm operations, confirm polling, confirm email
+        mock_get_input.return_value = "test@example.com"  # Email address
+        result = self.afi_creator.create_afi(afi_data={"name": "test", "create_bucket": True, "poll_interval": 300})
         self.afi_creator.s3_manager.create_bucket.assert_called_once()
-        mocks["_poll_afi_status"].assert_called_once_with("afi-12345", 300)
+        mock_wait_for_afi.assert_called_once()
 
         # Reset mocks and set up for cancellation test
         mock_confirm.reset_mock()
         mock_confirm.side_effect = None  # Clear side_effect
         mock_confirm.return_value = False  # Second call
         with self.assertRaises(KeyboardInterrupt) as cm:
-            self.afi_creator.create_afi({"name": "test"})
+            self.afi_creator.create_afi(afi_data={"name": "test"})
         self.assertEqual(str(cm.exception), "Operation cancelled by user")
 
     def test_afi_data_completion(self):
@@ -536,42 +542,36 @@ class TestAFICreator(unittest.TestCase):
                     self.assertEqual(result["name"], "New AFI")
                     self.assertEqual(result["description"], "New Description")
 
-    @patch("time.sleep")
-    def test_polling_scenarios(self, mock_sleep):
-        self.afi_creator.ec2_client = MagicMock()
-
-        test_cases = [
-            ({"Code": "available"}, "🎉 AFI creation completed successfully!"),
-            ({"Code": "failed"}, "❌ AFI creation failed: failed"),
-            ({"Code": "unavailable", "Message": "Error message"}, "Error: Error message"),
-        ]
-
-        # Capture all output
-        for state, expected_output in test_cases:
-            self.afi_creator.ec2_client.describe_fpga_images.return_value = {"FpgaImages": [{"State": state}]}
-            self.afi_creator._poll_afi_status("afi-12345", 60)
-            self.assertIn(expected_output, self.output.getvalue())
-            self.output.truncate(0)
-            self.output.seek(0)
-
-        # Test interrupts
-        mock_sleep.side_effect = KeyboardInterrupt()
-        self.afi_creator.ec2_client.describe_fpga_images.return_value = {"FpgaImages": [{"State": {"Code": "pending"}}]}
-        self.afi_creator._poll_afi_status("afi-12345", 60)
-        self.assertIn("Polling stopped", self.output.getvalue())
-        self.output.truncate(0)
-        self.output.seek(0)
-
-        # Test generic exception
-        self.afi_creator.ec2_client.describe_fpga_images.side_effect = Exception("Test error")
-        self.afi_creator._poll_afi_status("afi-12345", 60)
-        self.assertIn("Error polling AFI status: Test error", self.output.getvalue())
-
     @patch.object(DCPDiscovery, "find_hdk_dir")
     def test_provide_next_steps(self, mock_find_hdk):
         for hdk_dir in ["/path/to/hdk", None]:
             mock_find_hdk.return_value = hdk_dir
             self.afi_creator.provide_next_steps("agfi-12345")
+
+    @patch("os.path.getsize")
+    @patch("tarfile.open")
+    @patch("create_afi.UserInterface.confirm")
+    def test_create_afi_with_keyword_argument(self, mock_confirm, mock_tarfile, mock_getsize):
+        """Test that create_afi() works when called with keyword argument 'afi_data=' as done in production."""
+        # Setup mocks
+        mock_getsize.return_value = 1024 * 1024
+        mock_tarfile.return_value.__enter__.return_value.getnames.return_value = ["test.dcp"]
+        mock_confirm.return_value = True
+
+        self.afi_creator.ec2_client = MagicMock()
+        self.afi_creator.ec2_client.create_fpga_image.return_value = {
+            "FpgaImageId": "afi-12345",
+            "FpgaImageGlobalId": "agfi-67890",
+        }
+        self.afi_creator.s3_manager = MagicMock()
+
+        # Call with keyword argument as done in AFIManager.create_afi_request()
+        result = self.afi_creator.create_afi(afi_data=self.mock_afi_data.copy())
+
+        # Verify the call succeeded
+        self.assertEqual(result["FpgaImageId"], "afi-12345")
+        self.assertEqual(result["FpgaImageGlobalId"], "agfi-67890")
+        self.afi_creator.ec2_client.create_fpga_image.assert_called_once()
 
 
 class TestAFIManager(unittest.TestCase):
@@ -607,11 +607,7 @@ class TestAFIManager(unittest.TestCase):
             result = self.afi_manager.create_afi_request(self.mock_args, "us-east-1")
 
         self.assertEqual(result, self.mock_result)
-        mock_create_afi.assert_called_once_with(
-            afi_data=vars(self.mock_args),
-            create_bucket=self.mock_args.create_bucket,
-            poll_interval=self.mock_args.poll_interval,
-        )
+        mock_create_afi.assert_called_once_with(afi_data=vars(self.mock_args))
         mock_provide_steps.assert_called_once_with("agfi-67890")
         mock_print_success.assert_called_once_with(self.mock_result, "us-east-1", False)
 
@@ -690,7 +686,9 @@ class TestMain(unittest.TestCase):
 
 if __name__ == "__main__":
     try:
-        unittest.main(exit=False, buffer=True)
+        test_runner = unittest.TextTestRunner(buffer=True, verbosity=2)
+        test_suite = unittest.TestLoader().loadTestsFromModule(__import__(__name__))
+        result = test_runner.run(test_suite)
     except SystemExit:
         pass
     cov.stop()
@@ -702,3 +700,7 @@ if __name__ == "__main__":
     )
     # Optional: Generate HTML report
     # cov.html_report()
+
+    if not result.wasSuccessful():
+        print("Unit tests failed!")
+        sys.exit(1)

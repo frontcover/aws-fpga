@@ -3,7 +3,7 @@
 # =============================================================================
 # Amazon FPGA Hardware Development Kit
 #
-# Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use
 # this file except in compliance with the License. A copy of the License is
@@ -32,7 +32,6 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 from urllib.parse import unquote, urljoin
-
 import requests
 import urllib3
 import urllib3.util
@@ -84,10 +83,23 @@ class ResponseInfo:
     msg: str = ""
 
 
+def get_repo_root(timeout: int = 5) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        cwd=os.path.dirname(__file__),
+        timeout=timeout,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
 class LinkChecker:
     def __init__(self, exceptions_file: Optional[str] = None, worker_name: str = "links_logger"):
-        self.rtd_source_dir: Path = Path(f"{self._get_repo_root()}/docs-rtd/source")
-        self.rtd_build_dir: Path = Path(f"{self._get_repo_root()}/docs-rtd/build/html")
+        repo_root = get_repo_root()
+        self.rtd_source_dir: Path = Path(f"{repo_root}/docs-rtd/source")
+        self.rtd_build_dir: Path = Path(f"{repo_root}/docs-rtd/build/html")
         self.exceptions: set[str] = self._load_exceptions(exceptions_file) if exceptions_file else set()
         self.session: requests.Session = self._create_session()
         self.server_process: Optional[subprocess.Popen] = None
@@ -101,21 +113,6 @@ class LinkChecker:
 
         # Register cleanup
         atexit.register(self._cleanup)
-
-    def _get_repo_root(self) -> str:
-        try:
-            result = subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"],
-                capture_output=True,
-                text=True,
-                cwd=os.path.dirname(__file__),
-                timeout=5,
-                check=True,
-            )
-            return result.stdout.strip()
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-            current_dir = Path(__file__).parent.parent.parent
-            return str(current_dir.resolve())
 
     def _load_exceptions(self, exceptions_file: str) -> Set[str]:
         exceptions = set()
@@ -298,7 +295,7 @@ class LinkChecker:
             if response.status_code == 200:
                 return self._check_anchor_in_response(full_url, response)
             return ResponseInfo(
-                False, response.status_code, f"Page not found when attemptiong to check anchor link: {full_url}!"
+                False, response.status_code, f"Page not found when attempting to check anchor link: {full_url}!"
             )
         except Exception as e:
             return ResponseInfo(

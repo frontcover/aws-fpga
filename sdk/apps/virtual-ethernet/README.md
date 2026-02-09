@@ -14,11 +14,11 @@ In order to get the most from this document, readers may want to familiarize the
 
 # Virtual Ethernet Architecture
 
-The Virtual Ethernet architecture is built upon DPDK (http://dpdk.org). DPDK is an open source set of libraries and drivers for fast packet processing, and runs mostly in Linux user-space.
+The Virtual Ethernet architecture is built upon [DPDK](http://dpdk.org). DPDK is an open source set of libraries and drivers for fast packet processing, and runs mostly in Linux user-space.
 
 The following diagram shows the high level architecture for the Virtual Ethernet sample application(s) and Bringup/Debug tools.
 
-![alt tag](./images/Virtual_Ethernet_Arch.jpg)
+![Virtual Ethernet Arch](./../../../docs-rtd/source/_static/sdk/apps/virtual-ethernet/Virtual_Ethernet_Arch.jpg)
 
 ## User Space
 

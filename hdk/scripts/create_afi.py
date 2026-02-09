@@ -37,13 +37,13 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-
 import boto3
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.type_defs import CreateFpgaImageResultTypeDef
 from mypy_boto3_s3.client import S3Client
 from mypy_boto3_s3.type_defs import ListObjectsV2OutputTypeDef
 from pydantic import BaseModel, Field, field_validator
+from wait_for_afi import wait_for_afi
 
 
 DEFAULT_POLL_INTERVAL = 300
@@ -347,13 +347,9 @@ class AFICreator:
         self.dcp_discovery = DCPDiscovery()
         self.ec2_client: EC2Client = boto3.client("ec2", region_name=region)
 
-    def create_afi(
-        self, afi_data: Dict[str, str], create_bucket: bool = False, poll_interval: Optional[int] = None
-    ) -> CreateFpgaImageResultTypeDef:
-        complete_data = self._complete_afi_data(afi_data)
-        afi_metadata = AfiMetadata(**complete_data)
-
-        self._prepare_s3_resources(afi_metadata, create_bucket)
+    def create_afi(self, afi_data: Dict[str, str]) -> CreateFpgaImageResultTypeDef:
+        afi_metadata = AfiMetadata(**self._complete_afi_data(afi_data))
+        self._prepare_s3_resources(afi_metadata, afi_data.get("create_bucket"))
 
         if self.interactive:
             self._confirm_operations(afi_metadata)
@@ -363,8 +359,9 @@ class AFICreator:
         print(f"  AFI ID: {result['FpgaImageId']}")
         print(f"  AGFI ID: {result['FpgaImageGlobalId']}")
 
+        poll_interval = afi_data.get("poll_interval")
         if poll_interval:
-            self._handle_polling(result["FpgaImageId"], poll_interval)
+            self._handle_polling(result["FpgaImageId"], poll_interval, afi_data.get("email"), afi_data.get("sns_topic"))
         return result
 
     def _complete_afi_data(self, data: Dict[str, str]) -> Dict[str, str]:
@@ -414,40 +411,29 @@ Operations to execute:
         if not UserInterface.confirm("Proceed with these operations?"):
             raise KeyboardInterrupt("Operation cancelled by user")
 
-    def _handle_polling(self, afi_id: str, interval: int) -> None:
+    def _handle_polling(self, afi_id: str, interval: int, email: Optional[str], sns_topic: Optional[str]) -> None:
         should_poll = not self.interactive or UserInterface.confirm(
             f"Poll AFI status every {interval} seconds until completion?"
         )
 
         if should_poll:
-            self._poll_afi_status(afi_id, interval)
+            # Interactive email notification prompt
+            if self.interactive and not email:
+                if UserInterface.confirm(
+                    "Would you like to receive an email notification when AFI generation completes?"
+                ):
+                    email = UserInterface.get_input("Enter your email address: ")
 
-    def _poll_afi_status(self, afi_id: str, interval: int) -> None:
-        print(f"\nPolling AFI status every {interval // 60} minutes...")
-
-        while True:
-            try:
-                state = self.ec2_client.describe_fpga_images(FpgaImageIds=[afi_id])["FpgaImages"][0]["State"]
-                status_code = state["Code"]
-
-                print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] AFI Status: {status_code}")
-
-                if status_code == "available":
-                    print("\n🎉 AFI creation completed successfully!")
-                    break
-                if status_code in ["failed", "unavailable"]:
-                    print(f"\n❌ AFI creation failed: {status_code}")
-                    print(f"Error: {state.get('Message', 'MISSING')}")
-                    break
-
-                time.sleep(interval)
-
-            except KeyboardInterrupt:
-                print(f"\nPolling stopped. Check status with: aws ec2 describe-fpga-images --fpga-image-ids {afi_id}")
-                break
-            except Exception as e:
-                print(f"Error polling AFI status: {e}")
-                break
+            # Convert interval from seconds to minutes for wait_for_afi
+            exit_code = wait_for_afi(
+                afi_id=afi_id,
+                region=self.region,
+                email=email,
+                sns_topic=sns_topic,
+                sleep_seconds=interval,
+            )
+            if exit_code != 0:
+                print("\n⚠️  AFI generation did not complete successfully")
 
     def provide_next_steps(self, agfi_id: str) -> None:
         hdk_dir = DCPDiscovery.find_hdk_dir()
@@ -510,6 +496,8 @@ parser.add_argument(
     default=DEFAULT_POLL_INTERVAL,
     help=f"Polling interval in seconds (default: {DEFAULT_POLL_INTERVAL})",
 )
+parser.add_argument("--email", help="Email address for notification (Sends email when AFI gen completes)")
+parser.add_argument("--sns-topic", default="CREATE_AFI", help="SNS topic name (default: CREATE_AFI)")
 
 
 class AFIManager:
@@ -521,11 +509,7 @@ class AFIManager:
 
     def create_afi_request(self, args: argparse.Namespace, region: str):
         creator = AFICreator(region=region, interactive=args.interactive)
-        result = creator.create_afi(
-            afi_data=vars(args),
-            create_bucket=args.create_bucket,
-            poll_interval=args.poll_interval,
-        )
+        result = creator.create_afi(afi_data=vars(args))
 
         self.print_success(result, region, args.interactive)
         creator.provide_next_steps(result["FpgaImageGlobalId"])

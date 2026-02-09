@@ -43,6 +43,7 @@ check_for_empty_var "install_command" "$install_command" "Package manager detect
 $install_command zip
 $install_command wget
 if is_ubuntu; then
+    sudo apt-get update
     $install_command build-essential
 else
     sudo dnf groupinstall -y "Development tools"

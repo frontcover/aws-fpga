@@ -127,7 +127,7 @@ int dma_example(int slot_id, size_t buffer_size) {
     fail_on((rc = (write_fd < 0) ? -1 : 0), out, "unable to open write dma queue");
 
     rc = fill_buffer_urandom(write_buffer, buffer_size);
-    fail_on(rc, out, "unabled to initialize buffer");
+    fail_on(rc, out, "unable to initialize buffer");
 
     // The first 4 iters map to DDR and the fifth iter maps to HBM
     for (iter = 0; iter < 5; iter++) {

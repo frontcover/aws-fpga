@@ -28,12 +28,13 @@ OPTIONS
         Version of the Xilinx Virtual Cable driver to install (optional)
         Supported version(s):
           - 2025.1
+          - 2025.2
         Default value:
-            2025.1
+            2025.2
 
 EXAMPLES
-    Install Xilinx Virtual Cable driver 2025.1:
-        $ ./install_xilinx_virtual_cable.sh (defaults to version 2025.1)
+    Install Xilinx Virtual Cable driver 2025.2:
+        $ ./install_xilinx_virtual_cable.sh (defaults to version 2025.2)
         $ ./install_xilinx_virtual_cable.sh -v 2025.1
 EOF
     exit 1
@@ -43,7 +44,7 @@ EOF
 . $(git rev-parse --show-toplevel)/shared/bin/set_common_functions.sh
 . $(git rev-parse --show-toplevel)/shared/bin/set_common_env_vars.sh
 
-vivado_lab_edition_version="2025.1"
+vivado_lab_edition_version="2025.2"
 while getopts ":hv:" opt; do
   case $opt in
     h) xvc_install_help;;

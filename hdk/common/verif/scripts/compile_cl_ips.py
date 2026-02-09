@@ -106,31 +106,37 @@ class Compiler:
 
     def add_xil_defaultlib_path_to_initfile(self) -> None:
         lib_path_seperator: str = ':' if self.simulator == VCS else '='
-        new_line: str = f'{self.default_xilinx_library_name} {lib_path_seperator} {self.compile_cl_ip_dir}\n'
+        xilinx_defaultlib_mapping: str = f'{self.default_xilinx_library_name} {lib_path_seperator} {self.compile_cl_ip_dir}\n'
         line_insertion_map: Dict[str, Dict[str, Union[Callable, List[str]]]] = {
-            XSIM:   {'func': self.append_line_to_file, 'args': [self.sim_initfile, new_line, self.default_xilinx_library_name]},
-            VCS:    {'func': self.append_line_to_file, 'args': [self.sim_initfile, new_line, self.default_xilinx_library_name]},
-            QUESTA: {'func': self.insert_line_above_target, 'args': [self.sim_initfile, '[BC_COMPAT]', new_line]}}
+            XSIM:   {'func': self.append_line_to_file, 'args': [self.sim_initfile, xilinx_defaultlib_mapping, self.default_xilinx_library_name]},
+            VCS:    {'func': self.append_line_to_file, 'args': [self.sim_initfile, xilinx_defaultlib_mapping, self.default_xilinx_library_name]},
+            QUESTA: {'func': self.insert_line_at_end_of_section, 'args': [self.sim_initfile, '[Library]', xilinx_defaultlib_mapping]}}
         insertion_func: Callable = line_insertion_map[self.simulator]['func']
         insertion_args: List[str] = line_insertion_map[self.simulator]['args']
         insertion_func(*insertion_args)
 
-    def append_line_to_file(self, file_path: str, new_line: str, exception: str) -> None:
+    def append_line_to_file(self, file_path: str, xilinx_defaultlib_mapping: str, exception: str) -> None:
         with open(file_path, 'r+') as f:
             for line in f:
                 if exception is not None and exception in line:
                     break
             else:
-                f.write(new_line)
+                f.write(xilinx_defaultlib_mapping)
 
-    def insert_line_above_target(self, file_path: str, target: str, new_line: str) -> None:
-        exists: bool = False
+    def insert_line_at_end_of_section(self, file_path: str, section_header: str, xilinx_defaultlib_mapping: str) -> None:
+        exists, in_section, last_was_lib_entry = False, False, False
         for line in fileinput.input(file_path, inplace=True):
-            if self.default_xilinx_library_name in line:
-                exists: bool = True
-            if not exists and line.startswith(target):
-                print(new_line, end='')
+            exists |= self.default_xilinx_library_name in line
+            in_section |= line.strip().startswith(section_header)
+
+            is_lib_entry = in_section and '=' in line and not line.strip().startswith(';')
+            should_insert_xilinx_defaultlib = not exists and in_section and last_was_lib_entry and not is_lib_entry
+            if should_insert_xilinx_defaultlib:
+                print(xilinx_defaultlib_mapping, end='')
+                in_section = False
+
             print(line, end='')
+            last_was_lib_entry = is_lib_entry
 
     def get_all_cl_ip_compilation_script_paths(self) -> List[str]:
         ip_compile_scripts: List[str] = []
@@ -166,7 +172,7 @@ class Compiler:
         if self.simulator == QUESTA:
             self.remove_lines(f'{dir_path}/compile.do', line_prefixes_to_remove=['vlib', 'vmap'])
 
-        self.append_line_to_file(file_path, new_line='compile\n', exception=None)
+        self.append_line_to_file(file_path, xilinx_defaultlib_mapping='compile\n', exception=None)
         self.remove_lines(file_path, line_prefixes_to_remove=['run $*'])
         self.replace_hardcoded_xilninx_path(file_path)
 

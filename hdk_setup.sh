@@ -201,10 +201,10 @@ else
     info_msg "Skipping shell downloads and submodule setup (--skip_downloads specified)"
 fi
 
-info_msg "Settting up CL_IP for Vivado version $VIVADO_TOOL_VERSION"
+info_msg "Setting up CL_IP for Vivado version $VIVADO_TOOL_VERSION"
 
 cl_ip_path="hdk/common/ip"
-cl_ip_branch="Vivado_$VIVADO_TOOL_VERSION-$cl_ip_path"
+cl_ip_branch="Vivado_${VIVADO_TOOL_VERSION}-$cl_ip_path"
 
 if [ $skip_downloads -eq 0 ]; then
     check_git_lfs
@@ -212,11 +212,10 @@ if [ $skip_downloads -eq 0 ]; then
       return 1
     fi
     git submodule sync --recursive
-    # To ensure that users don't have to manually input git credentials
     GIT_LFS_SKIP_SMUDGE=1 git submodule update --init $cl_ip_path
+    GIT_LFS_SKIP_SMUDGE=1 git -C $cl_ip_path checkout $cl_ip_branch
+    GIT_LFS_SKIP_SMUDGE=1 git -C $cl_ip_path pull origin $cl_ip_branch
     GIT_LFS_USERNAME="" GIT_LFS_PASSWORD="" git -C $cl_ip_path lfs pull
-    git -C $cl_ip_path checkout $cl_ip_branch
-    git -C $cl_ip_path pull origin $cl_ip_branch
 else
     info_msg "Skipping shell downloads and submodule setup (--skip_downloads specified)"
 fi
@@ -265,11 +264,10 @@ if [ $skip_downloads -eq 0 ]; then
       return 1
     fi
     git submodule sync --recursive
-    # To ensure that users don't have to manually input git credentials
     GIT_LFS_SKIP_SMUDGE=1 git submodule update --init $hlx_path
+    GIT_LFS_SKIP_SMUDGE=1 git -C $hlx_path checkout $hlx_branch
+    GIT_LFS_SKIP_SMUDGE=1 git -C $hlx_path pull origin $hlx_branch
     GIT_LFS_USERNAME="" GIT_LFS_PASSWORD="" git -C $hlx_path lfs pull
-    git -C $hlx_path checkout $hlx_branch
-    git -C $hlx_path pull origin $hlx_branch
 else
     info_msg "Skipping shell downloads and submodule setup (--skip_downloads specified)"
 fi

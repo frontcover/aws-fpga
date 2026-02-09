@@ -120,6 +120,7 @@ vivado*.log
 
 # pytest artifacts
 .cache/
+docs-rtd/source/.pytest-cache/
 
 # Patches
 patches/*

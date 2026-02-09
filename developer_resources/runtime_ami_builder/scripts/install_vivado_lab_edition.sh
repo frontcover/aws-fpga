@@ -27,12 +27,13 @@ OPTIONS
         Version of Vivado Lab Edition to install (optional)
         Supported version(s):
           - 2025.1
+          - 2025.2
         Default value:
-            2025.1
+            2025.2
 
 EXAMPLES
-    Install Vivado Lab Edition 2025.1:
-        $ ./install_vivado_lab_edition.sh (defaults to version 2025.1)
+    Install Vivado Lab Edition 2025.2:
+        $ ./install_vivado_lab_edition.sh (defaults to version 2025.2)
         $ ./install_vivado_lab_edition.sh -v 2025.1
 EOF
     exit 1
@@ -42,7 +43,7 @@ EOF
 . $(git rev-parse --show-toplevel)/shared/bin/set_common_env_vars.sh
 export RAB_DIR="${AWS_FPGA_REPO_DIR}/developer_resources/runtime_ami_builder"
 
-vivado_lab_tool_version="2025.1"
+vivado_lab_tool_version="2025.2"
 while getopts ":hv:" opt; do
   case $opt in
     h) vle_install_help;;

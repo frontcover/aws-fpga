@@ -38,7 +38,7 @@ This guide helps customers developing for AWS F2 instances create a
 virtual desktop running on EC2 instances based on the `FPGA Developer
 AMI <../User-Guide-AWS-EC2-FPGA-Development-Kit.html#fpga-developer-ami>`__.
 The FPGA Developer AMI has pre-installed tools which are license free.
-Combined with DCV, this enables development using Vivado or Vitis'
+Combined with DCV, this enables development using Vivado or Vitis’
 graphical Integrated Design Environment (IDE), which provides an
 intuitive graphical user interface (GUI) to visualize FPGA development
 in the cloud.
@@ -49,16 +49,18 @@ Installing the Amazon DCV Server on an Amazon EC2 Instance
 Prerequisites
 ~~~~~~~~~~~~~
 
-1. `Instance and IAM Configuration for DCV Licensing <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#dcv-lic-req>`__
-2. `Dependency Installation <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui>`__
+1. `Instance and IAM Configuration for DCV
+   Licensing <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-license.html#dcv-lic-req>`__
+2. `Dependency
+   Installation <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-gui>`__
 
    - ⚠️ DO NOT PERFORM STEP 3! Upgrading may impact the stability of
      development kit software!
 
 3. `Protocol
    Setup <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-wayland>`__
-4. `Driver
-   Installation and Setting Virtual Display Resolution <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-nongpu>`__
+4. `Driver Installation and Setting Virtual Display
+   Resolution <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux-prereq.html#linux-prereq-nongpu>`__
 
 Amazon DCV Server Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,7 +70,7 @@ here <https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-li
 follow steps 1 through 5, 7, and 8. When you get to step 9, do the
 following:
 
-.. code:: bash
+.. code-block:: bash
 
        sudo apt --fix-broken install
        sudo apt install -y mesa-utils
@@ -89,7 +91,7 @@ In order to connect to an Amazon DCV session, you must have a password
 set for your user on the EC2 instance. This can be done with this
 command:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo passwd $USER
 
@@ -104,15 +106,15 @@ Amazon DCV Client Installation
 ------------------------------
 
 The `Amazon DCV client <https://www.amazondcv.com/>`__ should be
-installed on your local machine and is used to view your virtual
-desktop on your EC2 instance.
+installed on your local machine and is used to view your virtual desktop
+on your EC2 instance.
 
 Basic Session Management
 ------------------------
 
 To begin, run the following two commands:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo systemctl isolate multi-user.target (Ubuntu 20.04 only)
    sudo systemctl restart dcvserver.service
@@ -128,7 +130,7 @@ Quick Session Startup
 
 To start a session, use the following command:
 
-.. code:: bash
+.. code-block:: bash
 
    dcv create-session $your_session_number
    dcv list-sessions
@@ -138,11 +140,12 @@ You may give your session any number you like, but no two sessions may
 have the same number.
 
 From this point, you can access your session using the Amazon DCV client
-on your local machine or via the `DCV console in your web browser <https://docs.aws.amazon.com/dcv/latest/userguide/using-connecting-browser-connect.html>`__.
+on your local machine or via the `DCV console in your web
+browser <https://docs.aws.amazon.com/dcv/latest/userguide/using-connecting-browser-connect.html>`__.
 
 Enter ``https://user@ec2_instance_ip_address:8443`` into the
-``Hostname or IP Address`` box and click ``Connect``. Next, click "Trust
-and Connect".
+``Hostname or IP Address`` box and click ``Connect``. Next, click “Trust
+and Connect”.
 
 Enter the password you set in `Post-Installation
 Checks <#post-installation-checks>`__ in the ``Password`` box and click
@@ -152,11 +155,13 @@ At this point, you should see your session begin and a virtual desktop
 displayed after a brief delay.
 
 Now, open a terminal and run the following command:
-``source /etc/profile.d/default_module.sh``. You're now ready to use
+``source /etc/profile.d/default_module.sh``. You’re now ready to use
 your GUI-enabled EC2 Instance.
 
-.. code:: bash
+.. code-block:: bash
 
    ubuntu@ip-1-2-3-4:~$ source /etc/profile.d/default_module.sh
    ubuntu@ip-1-2-3-4:~$ vivado -version
    vivado v2024.1 (64-bit)
+
+`Back to Home <../index.html>`__
