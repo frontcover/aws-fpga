@@ -1,8 +1,15 @@
-# Software Performance Optimizations for F2.48xlarge Instances
+# Software Performance Optimizations
 
-This guide outlines strategies for maximizing performance on `f2.48xlarge` instances through effective CPU-to-FPGA mapping and NUMA optimization. In dual-socket configurations, implementing NUMA-aware techniques is essential for minimizing latency and maximizing PCIe bandwidth between CPUs and FPGA accelerators. The optimizations within this document do not apply to `f2.6xlarge` and `f2.12xlarge` instances because all CPU resources, memory, NVMe devices, and FPGA devices are on a single NUMA node.
+## Network Performance Optimization
 
-## Quick Start Guide
+**For multi-instance applications requiring low-latency inter-instance communication**, such as the [Virtual Ethernet framework](../apps/virtual-ethernet/README.md), using **EC2 Placement Groups** is critical for optimal network performance. Cluster placement groups ensure instances are placed on hardware with shared high-capacity networking infrastructure, providing the lowest possible network latency and highest throughput between instances.
+
+For detailed information about placement groups, see:
+- [Working with placement groups](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html)
+
+## NUMA Node Optimization
+
+This guide outlines strategies for maximizing performance on `f2.48xlarge` instances through effective CPU-to-FPGA mapping and NUMA optimization. In dual-socket configurations, implementing NUMA-aware techniques is essential for minimizing latency and maximizing PCIe bandwidth between CPUs and FPGA accelerators. The optimizations within this section do not apply to `f2.6xlarge` and `f2.12xlarge` instances because all CPU resources, memory, NVMe devices, and FPGA devices are on a single NUMA node.
 
 To optimize your application's performance running on an `f2.48xlarge` instance, refer to the [Script to Construct a FPGA to NUMA Node and vCPU Mapping](#script-to-construct-an-fpga-to-numa-node-and-vcpu-mapping) or follow the steps below:
 

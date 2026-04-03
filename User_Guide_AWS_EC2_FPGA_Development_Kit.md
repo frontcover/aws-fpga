@@ -214,8 +214,8 @@ A free-to-use FPGA developer AMI is available for on-cloud F2 development with A
 
 | FPGA Developer AMI Version | FPGA Developer AMI ID (us-east-1) | Vivado/Vitis Version Supported | Operating System Version    |
 |----------------------------|-----------------------------------|--------------------------------|-----------------------------|
-| 1.19.0                     | [ami-06691812f80312a04](http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq) | 2025.2 | Ubuntu 24.04 (kernel 6.8.0-1021-aws)|
-| 1.19.0                     | [ami-0648ba8008e805297](http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu) | 2025.2 | Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)|
+| 1.19.1                     | [ami-07c259dae738189ec](http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq) | 2025.2 | Ubuntu 24.04 (kernel 6.8.0-1021-aws)|
+| 1.19.1                     | [ami-039f2d1d9952ef402](http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu) | 2025.2 | Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)|
 | 1.16.1                     | [ami-092fc5deb8f3c0f7d](https://aws.amazon.com/marketplace/pp/prodview-f5kjsenkfkz5u) | 2024.1 | Ubuntu 20.04.6 (kernel 5.15)|
 
 Given the large size of the FPGA used for F2, AMD tools work best with at least 4 vCPU’s and 32GiB Memory. We recommend [Compute Optimized and Memory Optimized instance types](https://aws.amazon.com/ec2/instance-types/) to successfully run the synthesis of acceleration code. Developers may start coding and run simulations on low-cost `General Purpose` [instances types](https://aws.amazon.com/ec2/instance-types/).

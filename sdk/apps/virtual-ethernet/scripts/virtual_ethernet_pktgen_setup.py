@@ -15,7 +15,6 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 
 import argparse
 import logging
@@ -33,7 +32,7 @@ except AttributeError:
     pass
 
 dpdk_devbind = "./usertools/dpdk-devbind.py"
-num_2MB_hugepages = 16384
+num_2mb_hugepages = 16384
 
 # Logger
 logger = logging.getLogger("logger")
@@ -45,7 +44,8 @@ def print_success(scripts_path, install_path):
         "pktgen-dpdk may be run via the following steps:\n"
         f"  cd {install_path}/pktgen-dpdk\n"
         f"  sudo ./app/{make_tgt}/pktgen -l 0,1 -n 4 --proc-type auto --log-level 7 "
-        f"--socket-mem 2048 --file-prefix pg -- -T -P -m [1].0 -f {scripts_path}/pktgen-ena.pkt"
+        f"--socket-mem 2048 --file-prefix pg -- -T -P -m [1].0 "
+        f"-f {scripts_path}/pktgen-ena.pkt"
     )
 
 
@@ -104,7 +104,7 @@ def setup_dpdk(install_path, eni_dbdf, eni_ethdev):
     cmd_exec("mount -t hugetlbfs nodev /mnt/huge")
 
     # Configure hugepages
-    cmd_exec(f"echo {num_2MB_hugepages} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages")
+    cmd_exec(f"echo {num_2mb_hugepages} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages")
 
     cmd_exec("modprobe vfio enable_unsafe_noiommu_mode=1")
     cmd_exec("modprobe vfio-pci")

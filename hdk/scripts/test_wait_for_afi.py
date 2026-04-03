@@ -19,8 +19,9 @@
 
 
 if __name__ == "__main__":
-    import coverage
     import os
+
+    import coverage
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     cov = coverage.Coverage(source=[current_dir], omit=["*test*.py"])
@@ -31,17 +32,18 @@ import unittest
 from datetime import datetime, timedelta
 from io import StringIO
 from unittest.mock import Mock, patch
+
 import boto3
 from moto import mock_aws
 
 # Import the module under test
 from wait_for_afi import (
-    AFIWaiter,
-    setup_sns_notification,
-    send_sns_notification,
-    wait_for_afi,
-    main,
     DEFAULT_SNS_TOPIC,
+    AFIWaiter,
+    main,
+    send_sns_notification,
+    setup_sns_notification,
+    wait_for_afi,
 )
 
 
@@ -64,7 +66,6 @@ class TestAFIWaiter(unittest.TestCase):
         """Test checking AFI status when available."""
         waiter = AFIWaiter(self.afi_id, region=self.region)
 
-        # Mock the EC2 response
         waiter.ec2_client.describe_fpga_images = Mock(
             return_value={"FpgaImages": [{"State": {"Code": "available", "Message": "AFI is available"}}]}
         )
@@ -79,7 +80,16 @@ class TestAFIWaiter(unittest.TestCase):
         waiter = AFIWaiter(self.afi_id, region=self.region)
 
         waiter.ec2_client.describe_fpga_images = Mock(
-            return_value={"FpgaImages": [{"State": {"Code": "pending", "Message": "AFI generation in progress"}}]}
+            return_value={
+                "FpgaImages": [
+                    {
+                        "State": {
+                            "Code": "pending",
+                            "Message": "AFI generation in progress",
+                        }
+                    }
+                ]
+            }
         )
 
         status_code, error_message = waiter._check_afi_status()
@@ -92,9 +102,7 @@ class TestAFIWaiter(unittest.TestCase):
         waiter = AFIWaiter(self.afi_id, region=self.region)
 
         error_msg = "DCP validation failed"
-        waiter.ec2_client.describe_fpga_images = Mock(
-            return_value={"FpgaImages": [{"State": {"Code": "failed", "Message": error_msg}}]}
-        )
+        waiter.ec2_client.describe_fpga_images = Mock(return_value={"FpgaImages": [{"State": {"Code": "failed", "Message": error_msg}}]})
 
         status_code, error_message = waiter._check_afi_status()
         self.assertEqual(status_code, "failed")
@@ -251,8 +259,13 @@ class TestSNSFunctions(unittest.TestCase):
         topic_arn = setup_sns_notification(self.email, self.topic_name, self.region)
         afi_id = "afi-123"
 
-        # Should not raise exception
-        send_sns_notification(topic_arn, afi_id, success=True, status_code="available", region=self.region)
+        send_sns_notification(
+            topic_arn,
+            afi_id,
+            success=True,
+            status_code="available",
+            region=self.region,
+        )
 
     @mock_aws
     def test_send_sns_notification_failure(self):
@@ -262,9 +275,7 @@ class TestSNSFunctions(unittest.TestCase):
         error_msg = "Build failed"
 
         # Should not raise exception
-        send_sns_notification(
-            topic_arn, afi_id, success=False, status_code="failed", error_message=error_msg, region=self.region
-        )
+        send_sns_notification(topic_arn, afi_id, success=False, status_code="failed", error_message=error_msg, region=self.region)
 
     @mock_aws
     def test_send_sns_notification_error(self):
@@ -305,17 +316,19 @@ class TestWaitForAFIFunction(unittest.TestCase):
     @patch("time.sleep")
     def test_wait_for_afi_success_with_notification(self, mock_sleep):
         """Test wait_for_afi function - success with notification."""
-        with patch.object(AFIWaiter, "wait_for_completion") as mock_wait:
-            with patch("wait_for_afi.setup_sns_notification") as mock_sns_setup:
-                with patch("wait_for_afi.send_sns_notification") as mock_send:
-                    mock_wait.return_value = (True, "available", None)
-                    mock_sns_setup.return_value = "arn:aws:sns:us-east-1:123:test"
+        with (
+            patch.object(AFIWaiter, "wait_for_completion") as mock_wait,
+            patch("wait_for_afi.setup_sns_notification") as mock_sns_setup,
+            patch("wait_for_afi.send_sns_notification") as mock_send,
+        ):
+            mock_wait.return_value = (True, "available", None)
+            mock_sns_setup.return_value = "arn:aws:sns:us-east-1:123:test"
 
-                    exit_code = wait_for_afi(afi_id=self.afi_id, region=self.region, email=self.email)
+            exit_code = wait_for_afi(afi_id=self.afi_id, region=self.region, email=self.email)
 
-                    self.assertEqual(exit_code, 0)
-                    mock_sns_setup.assert_called_once()
-                    mock_send.assert_called_once()
+            self.assertEqual(exit_code, 0)
+            mock_sns_setup.assert_called_once()
+            mock_send.assert_called_once()
 
     @mock_aws
     def test_wait_for_afi_failure(self):
@@ -333,8 +346,9 @@ class TestWaitForAFIFunction(unittest.TestCase):
         with patch("wait_for_afi.setup_sns_notification") as mock_sns_setup:
             mock_sns_setup.side_effect = Exception("SNS Error")
 
-            with self.assertRaises(Exception):
+            with self.assertRaises(Exception) as context:
                 wait_for_afi(afi_id=self.afi_id, region=self.region, email=self.email)
+            self.assertIn("SNS Error", str(context.exception))
 
     @mock_aws
     @patch("time.sleep")
@@ -343,9 +357,7 @@ class TestWaitForAFIFunction(unittest.TestCase):
         with patch.object(AFIWaiter, "wait_for_completion") as mock_wait:
             mock_wait.return_value = (True, "available", None)
 
-            exit_code = wait_for_afi(
-                afi_id=self.afi_id, region=self.region, max_minutes=120, sns_topic="CUSTOM_TOPIC", sleep_seconds=30
-            )
+            exit_code = wait_for_afi(afi_id=self.afi_id, region=self.region, max_minutes=120, sns_topic="CUSTOM_TOPIC", sleep_seconds=30)
 
             self.assertEqual(exit_code, 0)
             # Verify custom sleep_seconds was passed
@@ -498,9 +510,7 @@ class TestIntegration(unittest.TestCase):
         waiter = AFIWaiter(afi_id, region=region, max_minutes=10)
 
         # Mock AFI failing
-        waiter.ec2_client.describe_fpga_images = Mock(
-            return_value={"FpgaImages": [{"State": {"Code": "failed", "Message": error_msg}}]}
-        )
+        waiter.ec2_client.describe_fpga_images = Mock(return_value={"FpgaImages": [{"State": {"Code": "failed", "Message": error_msg}}]})
 
         topic_arn = setup_sns_notification(email, DEFAULT_SNS_TOPIC, region)
         success, status_code, error_message = waiter.wait_for_completion(sleep_seconds=1)

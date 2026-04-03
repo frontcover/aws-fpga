@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # F2 documentation build configuration file, created by
 # sphinx-quickstart on Sat Nov 23 04:21:40 2024.
 #

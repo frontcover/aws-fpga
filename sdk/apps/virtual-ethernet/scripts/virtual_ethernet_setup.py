@@ -15,7 +15,6 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 
 import argparse
 import logging
@@ -24,7 +23,7 @@ import subprocess
 import sys
 
 dpdk_devbind = "./usertools/dpdk-devbind.py"
-num_2MB_hugepages = 16384
+num_2mb_hugepages = 16384
 
 # Logger
 logger = logging.getLogger("logger")
@@ -79,8 +78,7 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
 
     if not os.path.exists(dpdk_path):
         logger.error(
-            f"{dpdk_path=} does not exist.\n"
-            "Please specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
+            f"{dpdk_path=} does not exist.\nPlease specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
         )
         sys.exit(1)
 
@@ -99,8 +97,7 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
 
     if not os.path.exists(dpdk_devbind):
         logger.error(
-            f"{dpdk_devbind=} does not exist.\n"
-            "Please specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
+            f"{dpdk_devbind=} does not exist.\nPlease specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
         )
         sys.exit(1)
 
@@ -111,7 +108,7 @@ def setup_dpdk(dpdk_path, fpga_slot_str, eni_dbdf, eni_ethdev):
     cmd_exec("mount -t hugetlbfs nodev /mnt/huge")
 
     # Configure hugepages
-    cmd_exec(f"echo {num_2MB_hugepages} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages")
+    cmd_exec(f"echo {num_2mb_hugepages} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages")
 
     cmd_exec("modprobe vfio enable_unsafe_noiommu_mode=1")
     cmd_exec("modprobe vfio-pci")

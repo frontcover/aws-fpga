@@ -1,6 +1,28 @@
 F2 Developer Kit Release Notes
 ==============================
 
+v2.3.1
+------
+
+- Released FPGA Developer AMIs - 1.19.1: Ubuntu and Rocky Linux with AMD
+  patch
+  `AR000039913 <https://adaptivesupport.amd.com/s/article/000039913>`__
+  pre-installed. This fixes the XSIM compilation bug in Vivado 2025.2,
+  and the double compilation workaround has been removed from
+  ``Makefile.common.inc``
+- Updated verbiage in `Amazon DCV Setup
+  Guide <./developer-resources/Amazon-DCV-Setup-Guide.html>`__ to improve
+  clarity
+- Updated all NPM packages in
+  `package-lock.json <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/package-lock.json>`__
+  to address security advisories
+- Added information about EC2 instance placement groups to maximize
+  throughput and minimize latency when networking between instances in
+  the `Virtual Ethernet Application
+  Guide <./sdk/apps/virtual-ethernet/doc/Virtual-Ethernet-Application-Guide.html>`__
+- Formatted all Python files for style, consistency, and compliance with
+  PEP 8
+
 v2.3.0
 ------
 

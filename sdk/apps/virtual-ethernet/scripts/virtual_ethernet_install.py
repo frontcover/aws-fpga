@@ -15,7 +15,6 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 
 import argparse
 import glob
@@ -93,10 +92,7 @@ def install_dpdk(install_path):
 
     if os.path.exists(install_path):
         # Allow the user to remove an already existing install_path
-        logger.error(
-            f"{install_path=} already exists.\n"
-            "Please specify a different directory or remove the existing directory, exiting"
-        )
+        logger.error(f"{install_path=} already exists.\nPlease specify a different directory or remove the existing directory, exiting")
         sys.exit(1)
 
     # Install DPDK dependencies
