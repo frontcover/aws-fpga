@@ -1,7 +1,7 @@
 [codespell]
 # Codespell configuration for AWS FPGA documentation
 # Skip generated RST files, build artifacts, and binary files
-skip = .git,*.png,*.jpg,*.svg,*.pdf,build,*.pyc,__pycache__,*.spelling,docs-rtd/source/*.rst,docs-rtd/source,.codespellrc,*venv*,*.sv,*.svh,*.patch,*.pl,*.v,*.vh,*xdma_mod.c,*rtd-env*,*hdk/LICENSE.txt
+skip = .git,*.png,*.jpg,*.svg,*.pdf,build,*.pyc,__pycache__,*.spelling,docs-rtd/source/*.rst,docs-rtd/source,.codespellrc,*venv*,*.sv,*.svh,*.patch,*.pl,*.v,*.vh,*xdma_mod.c,*rtd-env*,*hdk/LICENSE.txt,*shared/.tests
 
 # Ignore words file (converted from spelling_wordlist.txt)
 ignore-words = docs-rtd/.codespell-ignore.txt

@@ -350,12 +350,12 @@ currently released to customers:
      - FPGA Developer AMI ID (us-east-1)
      - Vivado/Vitis Version Supported
      - Operating System Version
-   * - 1.19.0
-     - `ami-06691812f80312a04 <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
+   * - 1.19.1
+     - `ami-07c259dae738189ec <http://aws.amazon.com/marketplace/pp/prodview-tcl7sjgreh6bq>`__
      - 2025.2
      - Ubuntu 24.04 (kernel 6.8.0-1021-aws)
-   * - 1.19.0
-     - `ami-0648ba8008e805297 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
+   * - 1.19.1
+     - `ami-039f2d1d9952ef402 <http://aws.amazon.com/marketplace/pp/prodview-7mukkbz7l2uvu>`__
      - 2025.2
      - Rocky Linux 8.10 (4.18.0-553.36.1.el8_10.x86_64)
    * - 1.16.1

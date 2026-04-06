@@ -25,6 +25,29 @@ familiarize themselves with the following:
    logic.
 3. `EC2 Networking
    Concepts <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_Network_and_Security.html>`__
+4. `EC2 Placement
+   Groups <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html>`__
+   for optimal network performance
+
+Network Performance Considerations
+----------------------------------
+
+**For optimal network performance and lowest latency, instances should
+be launched in the same placement group.**
+
+When using Virtual Ethernet with multiple instances (e.g., an F2
+instance communicating with a packet generator instance), network
+latency and throughput are critical factors for performance. AWS
+provides several mechanisms to optimize network performance:
+
+**Cluster Placement Groups** Packs instances close together inside an
+Availability Zone. This strategy enables workloads to achieve the
+low-latency network performance necessary for tightly-coupled
+node-to-node communication that is typical of high-performance computing
+(HPC) applications.
+
+For more information, see: - `Working with placement
+groups <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html>`__
 
 Virtual Ethernet Architecture
 =============================

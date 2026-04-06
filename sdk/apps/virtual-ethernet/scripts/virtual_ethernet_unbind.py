@@ -15,7 +15,6 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 
 import argparse
 import logging
@@ -65,8 +64,7 @@ def unbind_fpga(dpdk_path, fpga_slot_str):
 
     if not os.path.exists(dpdk_path):
         logger.error(
-            f"{dpdk_path=} does not exist.\n"
-            "Please specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
+            f"{dpdk_path=} does not exist.\nPlease specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
         )
         sys.exit(1)
 
@@ -85,8 +83,7 @@ def unbind_fpga(dpdk_path, fpga_slot_str):
 
     if not os.path.exists(dpdk_devbind):
         logger.error(
-            f"{dpdk_devbind=} does not exist.\n"
-            "Please specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
+            f"{dpdk_devbind=} does not exist.\nPlease specify a dpdk directory that was installed via virtual-ethernet-install.py, exiting"
         )
         sys.exit(1)
 

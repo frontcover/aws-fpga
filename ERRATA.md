@@ -41,8 +41,6 @@ Shell errata is [documented here](./hdk/docs/AWS_Shell_ERRATA.md)
 9. Vivado 2025.1 introduces a `set_property DONT_TOUCH` to the HBM model that makes meeting
 timing difficult in the implementation stage. AMD has responded to this issue on their AR, stating that it will be fixed in a future version of Vivado. [See here for more details](https://adaptivesupport.amd.com/s/article/000038502?language=en_US&t=1754923887312). All HDK CL examples have been updated to address this issue. Customers should follow this AR when creating their own designs.
 
-10. Due to a XSIM bug in Vivado 2025.2, simulation library compilation with VCS and Questa requires a double compilation workaround, already added to `Makefile.common.inc`, until AMD releases a fix. This results in slightly longer compilation time and generation of a `cxl_error.log` file with an expected error caused by the `sc_ultralite_v1_0_rfs.vhd` file (which can be safely ignored).
-
 ## HLx
 
 1. When executing the `aws::make_ipi` command in Vivado to set up the HLx IPI environment, the AWS IP instance may default to the name `f1_inst`. This is a known Vivado behavior and can be safely ignored. Users can rename this instance according to their preference.

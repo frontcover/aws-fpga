@@ -15,7 +15,6 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 
 import argparse
 import glob
@@ -47,7 +46,8 @@ def print_success(scripts_path, install_path):
     logger.info(
         "pktgen-dpdk installation and build complete!\n"
         "pktgen-dpdk may be setup via the following step:\n"
-        f"  sudo {scripts_path}/virtual_ethernet_pktgen_setup.py {install_path} --eni_dbdf <ENI_DBDF> --eni_ethdev <ENI_ETHDEV>"
+        f"  sudo {scripts_path}/virtual_ethernet_pktgen_setup.py {install_path} "
+        "--eni_dbdf <ENI_DBDF> --eni_ethdev <ENI_ETHDEV>"
     )
 
 
@@ -85,10 +85,7 @@ def install_pktgen_dpdk(install_path):
 
     if os.path.exists(install_path):
         # Allow the user to remove an already existing install_path
-        logger.error(
-            f"{install_path=} already exists.\n"
-            "Please specify a different directory or remove the existing directory, exiting"
-        )
+        logger.error(f"{install_path=} already exists.\nPlease specify a different directory or remove the existing directory, exiting")
         sys.exit(1)
 
     # Install DPDK dependencies

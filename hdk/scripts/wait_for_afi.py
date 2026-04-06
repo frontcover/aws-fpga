@@ -29,24 +29,22 @@ import sys
 import time
 import traceback
 from datetime import datetime, timedelta
-from typing import Optional, Tuple
 
 import boto3
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_sns.client import SNSClient
-
 
 MAX_POLL_MINUTES = 360
 DEFAULT_SNS_TOPIC = "CREATE_AFI"
 
 
 class AFIWaiter:
-    def __init__(self, afi_id: str, region: Optional[str] = None, max_minutes: int = MAX_POLL_MINUTES):
+    def __init__(self, afi_id: str, region: str | None = None, max_minutes: int = MAX_POLL_MINUTES):
         self.afi_id = afi_id
         self.max_duration = timedelta(minutes=max_minutes)
         self.ec2_client: EC2Client = boto3.client("ec2", region_name=region) if region else boto3.client("ec2")
 
-    def _check_afi_status(self) -> Tuple[str, Optional[str]]:
+    def _check_afi_status(self) -> tuple[str, str | None]:
         response = self.ec2_client.describe_fpga_images(FpgaImageIds=[self.afi_id])
         afi_info = response["FpgaImages"][0]
         state = afi_info["State"]
@@ -54,7 +52,7 @@ class AFIWaiter:
         error_message = state.get("Message") if status_code in ["failed", "unavailable"] else None
         return status_code, error_message
 
-    def wait_for_completion(self, sleep_seconds: int) -> Tuple[bool, str, Optional[str]]:
+    def wait_for_completion(self, sleep_seconds: int) -> tuple[bool, str, str | None]:
         start_time = datetime.utcnow()
         print(f"⏳ Waiting for {self.afi_id} generation to complete...")
         print(f"⏱️  Maximum wait time: {self.max_duration.total_seconds() / 60:.1f} minutes")
@@ -86,16 +84,14 @@ class AFIWaiter:
             time.sleep(sleep_seconds)
 
 
-def setup_sns_notification(email: str, topic_name: str, region: Optional[str] = None) -> str:
+def setup_sns_notification(email: str, topic_name: str, region: str | None = None) -> str:
     sns_client: SNSClient = boto3.client("sns", region_name=region) if region else boto3.client("sns")
 
     response = sns_client.create_topic(Name=topic_name)
     topic_arn = response["TopicArn"]
     print(f"📧 Using SNS topic: {topic_arn}")
 
-    sub_response = sns_client.subscribe(
-        TopicArn=topic_arn, Protocol="email", Endpoint=email, ReturnSubscriptionArn=True
-    )
+    sub_response = sns_client.subscribe(TopicArn=topic_arn, Protocol="email", Endpoint=email, ReturnSubscriptionArn=True)
 
     subscription_arn = sub_response.get("SubscriptionArn")
     if subscription_arn == "pending confirmation":
@@ -111,8 +107,8 @@ def send_sns_notification(
     afi_id: str,
     success: bool,
     status_code: str,
-    error_message: Optional[str] = None,
-    region: Optional[str] = None,
+    error_message: str | None = None,
+    region: str | None = None,
 ):
     sns_client: SNSClient = boto3.client("sns", region_name=region) if region else boto3.client("sns")
 
@@ -134,9 +130,9 @@ def send_sns_notification(
 
 def wait_for_afi(
     afi_id: str,
-    region: Optional[str] = None,
+    region: str | None = None,
     max_minutes: int = MAX_POLL_MINUTES,
-    email: Optional[str] = None,
+    email: str | None = None,
     sns_topic: str = DEFAULT_SNS_TOPIC,
     sleep_seconds: int = 60,
 ) -> int:

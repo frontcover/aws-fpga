@@ -99,19 +99,25 @@ PacketGen Dual Instance Loopback
 This example maximizes PPS for 64B packets with a single vCPU using two
 instances to test end-to-end traffic flows.
 
-In the below diagram, the ``red`` line shows the Ethernet frame path
+In the diagram below, the ``red`` line shows the Ethernet frame path
 from the **Packet Generator Instance** into the CL streaming application
 in the **Virtual Ethernet Instance**. The ``blue`` line shows the
 Ethernet frame path from the CL streaming application in the **Virtual
-Ethernet Instance** to the **Packet Generator Instance**. For best
-performance, the **Virtual Ethernet Instance** and the **Packet
-Generator Instance** should be created in the same VPC and `placement
-group <#q-why-cant-i-launch-instance-type-x-in-a-placement-group-with-an-f2>`__.
-It should also be an instance type which `supports the Elastic Network
-Adapter <#q-what-instance-types-support-enhanced-networking>`__ (driver)
-type of Enhanced Networking. This example was tested using an
-``f2.48xlarge`` and an ``m5.2xlarge`` as the **Packet Generator
-Instance**.
+Ethernet Instance** to the **Packet Generator Instance**.
+
+**⚠️ For optimal performance and lowest network latency**, the **Virtual
+Ethernet Instance** and the **Packet Generator Instance** should be: -
+Created in the same VPC - Launched in the same `cluster placement
+group <#q-why-cant-i-launch-instance-type-x-in-a-placement-group-with-an-f2>`__
+- Using instance types which `support the Elastic Network
+Adapter <#q-what-instance-types-support-enhanced-networking>`__ (ENA
+driver) type of Enhanced Networking
+
+Launching instances in a cluster placement group ensures they are placed
+on hardware with shared, high-capacity networking infrastructure,
+providing the lowest possible network latency and highest throughput.
+This example was tested using an ``f2.48xlarge`` and an ``m5.2xlarge``
+as the **Packet Generator Instance**.
 
 .. figure::
    ../../../../_static/sdk/apps/virtual-ethernet/Virtual_Ethernet_Pktgen.jpg

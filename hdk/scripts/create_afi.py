@@ -36,7 +36,8 @@ import time
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
+
 import boto3
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.type_defs import CreateFpgaImageResultTypeDef
@@ -44,7 +45,6 @@ from mypy_boto3_s3.client import S3Client
 from mypy_boto3_s3.type_defs import ListObjectsV2OutputTypeDef
 from pydantic import BaseModel, Field, field_validator
 from wait_for_afi import wait_for_afi
-
 
 DEFAULT_POLL_INTERVAL = 300
 
@@ -82,12 +82,12 @@ class AfiMetadata(BaseModel):
                     raise ValueError("DCP tar file contains no files")
 
         except (OSError, tarfile.TarError) as e:
-            raise ValueError(f"Invalid DCP file: {e}")
+            raise ValueError(f"Invalid DCP file: {e}") from e
 
         print(f"✓ DCP file validation passed: {v} ({file_size / (1024 * 1024):.1f}MB)")
         return v
 
-    def get_create_args(self) -> Dict[str, Any]:
+    def get_create_args(self) -> dict[str, Any]:
         return {
             "InputStorageLocation": {"Bucket": self.bucket, "Key": self.dcp_s3_path},
             "LogsStorageLocation": {"Bucket": self.bucket, "Key": self.logs_s3_path},
@@ -103,13 +103,10 @@ class RegionManager:
     F2_INSTANCE_TYPES = ["f2.6xlarge", "f2.12xlarge", "f2.48xlarge"]
 
     @staticmethod
-    def get_supported_regions() -> List[str]:
+    def get_supported_regions() -> list[str]:
         # Get the regions from the cache if it's less than 24 hours old
         try:
-            if (
-                RegionManager.CACHE_FILE.exists()
-                and (time.time() - RegionManager.CACHE_FILE.stat().st_mtime) < RegionManager.CACHE_TTL
-            ):
+            if RegionManager.CACHE_FILE.exists() and (time.time() - RegionManager.CACHE_FILE.stat().st_mtime) < RegionManager.CACHE_TTL:
                 with RegionManager.CACHE_FILE.open("r") as f:
                     regions = json.load(f)["regions"]
                     if regions:
@@ -118,11 +115,7 @@ class RegionManager:
             pass
 
         # Get regions from AWS or fallback to known list
-        regions = (
-            RegionManager._get_current_f2_region_list()
-            if boto3.Session().get_credentials()
-            else RegionManager.KNOWN_F2_REGIONS
-        )
+        regions = RegionManager._get_current_f2_region_list() if boto3.Session().get_credentials() else RegionManager.KNOWN_F2_REGIONS
 
         # Save the latest regions in the cache
         try:
@@ -135,15 +128,15 @@ class RegionManager:
         return regions
 
     @staticmethod
-    def _get_current_f2_region_list() -> List[str]:
+    def _get_current_f2_region_list() -> list[str]:
         print("🔍 Discovering F2 instance supported regions via AWS API...")
-        regions: List[str] = []
+        regions: list[str] = []
         for region in boto3.Session().get_available_regions("ec2"):
             try:
                 ec2 = boto3.client("ec2", region_name=region)
-                if ec2.describe_instance_type_offerings(
-                    Filters=[{"Name": "instance-type", "Values": RegionManager.F2_INSTANCE_TYPES}]
-                )["InstanceTypeOfferings"]:
+                if ec2.describe_instance_type_offerings(Filters=[{"Name": "instance-type", "Values": RegionManager.F2_INSTANCE_TYPES}])[
+                    "InstanceTypeOfferings"
+                ]:
                     regions.append(region)
                     print(f"  ✓ Found F2 support in {region}")
             except Exception:
@@ -154,14 +147,13 @@ class RegionManager:
     def validate_region_supports_f2(region: str) -> None:
         if region not in RegionManager.get_supported_regions():
             raise ValueError(
-                f"Region '{region}' does not support F2 instances.\n"
-                f"Supported regions: {', '.join(RegionManager.get_supported_regions())}"
+                f"Region '{region}' does not support F2 instances.\nSupported regions: {', '.join(RegionManager.get_supported_regions())}"
             )
 
 
 class UserInterface:
     @staticmethod
-    def get_choice_from_options(prompt: str, options: List[str], default: int = 0) -> int:
+    def get_choice_from_options(prompt: str, options: list[str], default: int = 0) -> int:
         print(f"\n{prompt}")
         [print(f"{i + 1}) {opt}") for i, opt in enumerate(options)]
 
@@ -190,7 +182,7 @@ class UserInterface:
 
 class DCPDiscovery:
     @staticmethod
-    def find_hdk_dir() -> Optional[str]:
+    def find_hdk_dir() -> str | None:
         if os.environ.get("HDK_DIR"):
             return os.environ.get("HDK_DIR")
 
@@ -206,7 +198,7 @@ class DCPDiscovery:
         return DCPDiscovery.search_for_repo_root_from_current_script_dir()
 
     @staticmethod
-    def search_for_repo_root_from_current_script_dir() -> Optional[str]:
+    def search_for_repo_root_from_current_script_dir() -> str | None:
         current_path = Path(__file__).resolve().parent
         while current_path != current_path.parent:
             hdk_dir = current_path / "hdk"
@@ -217,7 +209,7 @@ class DCPDiscovery:
         print("⚠️  Could not find an HDK directory", file=sys.stderr)
         return None
 
-    def find_dcp_files_in_hdk_workspace(self) -> List[Tuple[str, str]]:
+    def find_dcp_files_in_hdk_workspace(self) -> list[tuple[str, str]]:
         hdk_dir = DCPDiscovery.find_hdk_dir()
         if not hdk_dir:
             return []
@@ -269,8 +261,8 @@ class S3Manager:
         self.region = region
         self.s3_client: S3Client = boto3.client("s3")
 
-    def get_regional_buckets(self) -> List[str]:
-        buckets: List[str] = []
+    def get_regional_buckets(self) -> list[str]:
+        buckets: list[str] = []
         for bucket_name in [b.get("Name", "") for b in self.s3_client.list_buckets()["Buckets"]]:
             try:
                 location = self.s3_client.get_bucket_location(Bucket=bucket_name).get("LocationConstraint")
@@ -281,7 +273,7 @@ class S3Manager:
         return buckets
 
     def create_bucket(self, bucket_name: str) -> None:
-        kwargs: Dict[str, Any] = {"Bucket": bucket_name}
+        kwargs: dict[str, Any] = {"Bucket": bucket_name}
         if self.region != "us-east-1":
             kwargs["CreateBucketConfiguration"] = {"LocationConstraint": self.region}
         self.s3_client.create_bucket(**kwargs)
@@ -310,7 +302,7 @@ class S3Manager:
         self.create_bucket(bucket_name)
         return bucket_name
 
-    def get_s3_paths_interactive(self, bucket: str) -> Tuple[str, str]:
+    def get_s3_paths_interactive(self, bucket: str) -> tuple[str, str]:
         msg = "Store DCP file and logs in the same directory?"
         same_dir = UserInterface.get_choice_from_options(msg, ["Yes, same directory", "No, separate directories"]) == 0
 
@@ -330,9 +322,7 @@ class S3Manager:
 
         if folders:
             options = folders + ["Enter custom path"]
-            idx = UserInterface.get_choice_from_options(
-                f"Select folder in bucket '{bucket}':", options, default=len(folders)
-            )
+            idx = UserInterface.get_choice_from_options(f"Select folder in bucket '{bucket}':", options, default=len(folders))
             if idx < len(folders):
                 return folders[idx]
 
@@ -347,7 +337,7 @@ class AFICreator:
         self.dcp_discovery = DCPDiscovery()
         self.ec2_client: EC2Client = boto3.client("ec2", region_name=region)
 
-    def create_afi(self, afi_data: Dict[str, str]) -> CreateFpgaImageResultTypeDef:
+    def create_afi(self, afi_data: dict[str, str]) -> CreateFpgaImageResultTypeDef:
         afi_metadata = AfiMetadata(**self._complete_afi_data(afi_data))
         self._prepare_s3_resources(afi_metadata, afi_data.get("create_bucket"))
 
@@ -364,7 +354,7 @@ class AFICreator:
             self._handle_polling(result["FpgaImageId"], poll_interval, afi_data.get("email"), afi_data.get("sns_topic"))
         return result
 
-    def _complete_afi_data(self, data: Dict[str, str]) -> Dict[str, str]:
+    def _complete_afi_data(self, data: dict[str, str]) -> dict[str, str]:
         if not data.get("name") and self.interactive:
             data["name"] = UserInterface.get_input("Enter AFI name: ")
 
@@ -411,20 +401,17 @@ Operations to execute:
         if not UserInterface.confirm("Proceed with these operations?"):
             raise KeyboardInterrupt("Operation cancelled by user")
 
-    def _handle_polling(self, afi_id: str, interval: int, email: Optional[str], sns_topic: Optional[str]) -> None:
-        should_poll = not self.interactive or UserInterface.confirm(
-            f"Poll AFI status every {interval} seconds until completion?"
-        )
+    def _handle_polling(self, afi_id: str, interval: int, email: str | None, sns_topic: str | None) -> None:
+        should_poll = not self.interactive or UserInterface.confirm(f"Poll AFI status every {interval} seconds until completion?")
 
         if should_poll:
-            # Interactive email notification prompt
+            # In interactive mode, optionally prompt for email notification
             if self.interactive and not email:
-                if UserInterface.confirm(
-                    "Would you like to receive an email notification when AFI generation completes?"
-                ):
+                resp = UserInterface.confirm("Would you like to receive an email notification when AFI generation completes?")
+                if resp:
                     email = UserInterface.get_input("Enter your email address: ")
 
-            # Convert interval from seconds to minutes for wait_for_afi
+            # Poll for AFI completion
             exit_code = wait_for_afi(
                 afi_id=afi_id,
                 region=self.region,
