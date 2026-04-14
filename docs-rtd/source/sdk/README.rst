@@ -86,6 +86,12 @@ Applications
 - `MSI-X Interrupts <./apps/msix-interrupts/README.html>`__ - Interrupt
   handling implementation
 
+Interactive Jupyter Notebooks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- `F2 Jupyter Notebooks <./notebooks/README.html>`__ - Hands-on tutorials
+  for FPGA register access and development from Python
+
 Performance & Optimization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -127,5 +133,7 @@ Additional SDK Documentation
    userspace/fpga-mgmt-tools/README
    docs/F2-Software-Performance-Optimization-Guide
    docs/Load-Times
+
+   notebooks/README
 
 `Back to Home <../index.html>`__

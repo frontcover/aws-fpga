@@ -17,6 +17,7 @@
 #include <utils/lcd.h>
 #include <utils/log.h>
 #include <fpga_clkgen.h>
+#include <string.h>
 
 //
 // Frequency Table with multiplier and divider values for MMCM, sorted as per increasing frequency order.
@@ -224,6 +225,7 @@ static int aws_clkgen_set_freq(enum fpga_clkgen_mmcm_group group, uint32_t req_f
 
     int idx_choice = 0;
     struct clkgen_recipe recipe;
+    memset(&recipe, 0, sizeof(recipe));
 
     // get index of closest match to the target freq from the FREQ_TABLE
     if (!reset) {

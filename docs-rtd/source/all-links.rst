@@ -24,6 +24,15 @@ Custom Logic Examples
 
   hdk/cl/CHECKLIST-BEFORE-BUILDING-CL
 
+cl_axil_reg_access
+""""""""""""""""""
+
+.. toctree::
+  :maxdepth: 1
+
+  hdk/cl/examples/cl-demo/cl-axil-reg-access/README
+  hdk/cl/examples/cl-demo/cl-axil-reg-access/verif/README
+
 cl_dram_hbm_dma
 """""""""""""""
 

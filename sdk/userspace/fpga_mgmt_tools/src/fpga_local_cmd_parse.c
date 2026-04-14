@@ -861,7 +861,7 @@ out_ver:
 }
 
 
-static  char default_tcp_port[5] = "10201";
+static  char default_tcp_port[] = "10201";
 /**
  * Parse fpga-start-virtual-jtag command line arguments.
  *

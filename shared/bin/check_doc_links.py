@@ -53,6 +53,8 @@ MAX_RETRIES = 1
 BACKOFF_FACTOR = 1
 ERROR = "ERROR"
 EXCEPTION = "EXCEPTION"
+# Restart the local HTTP server every BATCH_SIZE links
+BATCH_SIZE = 500
 
 
 class ResultEnum(IntEnum):
@@ -103,6 +105,7 @@ class LinkChecker:
         self.exceptions: set[str] = self._load_exceptions(exceptions_file) if exceptions_file else set()
         self.session: requests.Session = self._create_session()
         self.server_process: subprocess.Popen | None = None
+        self.links_since_last_restart = 0
 
         self.total_checked = 0
         self.total_ok = 0
@@ -161,6 +164,16 @@ class LinkChecker:
         if self.session:
             self.session.close()
         self._stop_server()
+
+    def _restart_server_and_session(self) -> None:
+        """Recycle the local HTTP server and HTTP session every BATCH_SIZE links to
+        prevent stale connection pool exhaustion on large link sets."""
+        logger.info(f"  [Batch restart] Recycling server and session after {self.links_since_last_restart} links...")
+        self._stop_server()
+        self.session.close()
+        self.session = self._create_session()
+        self.links_since_last_restart = 0
+        self._start_local_server()
 
     def find_rst_files(self, file_patterns: list[str]) -> list[str]:
         if not self.rtd_source_dir.exists():
@@ -238,6 +251,7 @@ class LinkChecker:
                     self.server_process.wait(timeout=2)
                 except Exception:
                     pass
+            self.server_process = None
 
     def _check_external_link(self, url: str) -> ResponseInfo:
         try:
@@ -371,7 +385,12 @@ class LinkChecker:
 
     def check_link(self, rst_file: str, link_text: str, link_url: str) -> ResultEnum:
         self.total_checked += 1
+        self.links_since_last_restart += 1
         display_text = self._format_display_text(link_text)
+
+        # Restart server and recycle session every BATCH_SIZE links
+        if self.links_since_last_restart > BATCH_SIZE:
+            self._restart_server_and_session()
 
         if link_url in self.exceptions:
             self.total_exceptions += 1

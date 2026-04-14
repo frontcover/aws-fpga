@@ -81,7 +81,7 @@ Table of Contents
   - `Cleaning Up Resources <#cleaning-up-resources>`__
 
 - `Creating Custom Components <#creating-custom-components>`__
-- `Issues/Support <#issuessupport>`__
+- `Issues and Support <#issues-and-support>`__
 - `FAQ <#faq>`__
 
 What is the AWS CDK?
@@ -477,8 +477,8 @@ Once the component has been created, add it to the ``componentConfigs``
 list in `lib/runtimeAmiBuilder.ts <https://github.com/aws/aws-fpga/tree/f2/developer_resources/runtime_ami_builder/lib/runtimeAmiBuilder.ts>`__ for
 use in the runtime AMI build.
 
-Issues/Support
---------------
+Issues and Support
+------------------
 
 - `Open an issue on GitHub
   if <https://github.com/aws/aws-fpga/issues>`__:
