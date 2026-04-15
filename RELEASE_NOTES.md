@@ -1,5 +1,12 @@
 # F2 Developer Kit Release Notes
 
+## v2.3.2
+
+* Introducing a new beginner-friendly CL example called [cl_axil_reg_access](./hdk/cl/examples/cl_demo/cl_axil_reg_access/README.md) that demonstrates OCL AXI-Lite interface usage for CL register access
+  * [Interactive Jupyter Notebooks](./sdk/notebooks/README.md) provide step-by-step instructions for the software runtime example, guiding developers through loading an AFI and performing register reads and writes on a live F2 instance
+* Added IP warning suppression for Vitis builds with compatible XSAs
+* General bug fixes
+
 ## v2.3.1
 
 * Released FPGA Developer AMIs - 1.19.1: Ubuntu and Rocky Linux with AMD patch [AR000039913](https://adaptivesupport.amd.com/s/article/000039913) pre-installed. This fixes the XSIM compilation bug in Vivado 2025.2, and the double compilation workaround has been removed from `Makefile.common.inc`

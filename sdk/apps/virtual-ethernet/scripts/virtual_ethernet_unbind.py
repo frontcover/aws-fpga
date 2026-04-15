@@ -50,13 +50,17 @@ def fpga_slot_str2dbdf(fpga_slot_str):
     fpga_slots = check_output(cmd).splitlines()
     for slot_str in fpga_slots:
         logger.debug(f"{slot_str=}")
-        (_, slot_num, _, _, dbdf) = slot_str.split()
+        fields = slot_str.split()
+        if len(fields) < 5:
+            continue
+        (_, slot_num, _, _, dbdf) = fields[:5]
         if slot_num.decode() == fpga_slot_str:
             found = True
             break
     if not found:
         logger.error(f"Could not find {fpga_slot_str=}")
-    return dbdf.decode()
+        dbdf = "None"
+    return dbdf if isinstance(dbdf, str) else dbdf.decode()
 
 
 def unbind_fpga(dpdk_path, fpga_slot_str):

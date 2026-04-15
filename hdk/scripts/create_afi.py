@@ -215,6 +215,7 @@ class DCPDiscovery:
             return []
 
         dcp_paths = glob.glob(os.path.join(hdk_dir, "cl", "examples", "*", "build", "checkpoints", "*.tar"))
+        dcp_paths += glob.glob(os.path.join(hdk_dir, "cl", "examples", "cl_demo", "*", "build", "checkpoints", "*.tar"))
         return [(path, self._create_display_name(path)) for path in sorted(dcp_paths)]
 
     def _create_display_name(self, path: str) -> str:

@@ -18,7 +18,7 @@
 # When being run $0 and $_ will be the same.
 
 script=${BASH_SOURCE[0]}
-if [ $script == $0 ]; then
+if [ "$script" == "$0" ]; then
   echo "ERROR: You must source this script"
   exit 2
 fi
@@ -30,6 +30,11 @@ current_dir=$(pwd)
 
 debug=0
 skip_downloads=0
+
+if ! source $script_dir/shared/bin/set_common_functions.sh; then
+  echo "ERROR: Couldn't set up common functions for HDK! Exiting!" >&2
+  return 1
+fi
 
 function usage {
   echo -e "USAGE: source [\$AWS_FPGA_REPO_DIR/]$script_name [-d|-debug] [-s|-skip_downloads][-h|-help]"
@@ -102,10 +107,6 @@ for ((i = 0; i < ${#args[@]}; i++)); do
   esac
 done
 
-if ! source $script_dir/shared/bin/set_common_functions.sh; then
-  err_msg "Couldn't set up common functions for HDK! Exiting!"
-  return 1
-fi
 if ! source $script_dir/shared/bin/set_common_env_vars.sh; then
   err_msg "Couldn't set up env vars for HDK! Exiting!"
   return 1

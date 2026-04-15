@@ -56,7 +56,7 @@ def main() -> None:
     while status == "busy":
         status = fpga_mgmt_wrapper.describe_local_image(slot, get_hw_metrics)["status"]
 
-    info: dict[str, Any] = json.dumps(fpga_clkgen_wrapper.get_dynamic(slot), indent=2)
+    info: str = json.dumps(fpga_clkgen_wrapper.get_dynamic(slot), indent=2)
     print(f"Clock Information\n {info}")
 
     print("Setting dynamic clock\n")

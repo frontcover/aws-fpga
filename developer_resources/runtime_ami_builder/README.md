@@ -46,7 +46,7 @@ The RAB makes creating a runtime AMI for individual applications convenient by s
   - [Running the Image Builder Pipeline](#running-the-image-builder-pipeline)
   - [Cleaning Up Resources](#cleaning-up-resources)
 - [Creating Custom Components](#creating-custom-components)
-- [Issues/Support](#issuessupport)
+- [Issues and Support](#issues-and-support)
 - [FAQ](#faq)
 
 ## What is the AWS CDK?
@@ -295,7 +295,7 @@ A component's commands are executed as bash commands during the AMI build. The E
 
 Once the component has been created, add it to the `componentConfigs` list in [lib/runtimeAmiBuilder.ts](./lib/runtimeAmiBuilder.ts) for use in the runtime AMI build.
 
-## Issues/Support
+## Issues and Support
 
 - [Open an issue on GitHub if](https://github.com/aws/aws-fpga/issues):
   - A code bug is found

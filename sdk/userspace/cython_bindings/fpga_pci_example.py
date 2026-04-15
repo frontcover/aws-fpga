@@ -119,8 +119,8 @@ def main() -> None:
     fpga_pci_wrapper.pci_detach(handle)
 
     print("\nResource Map")
-    map: dict[str, Any] = json.dumps(fpga_pci_wrapper.pci_get_resource_map(slot_id, pf_id=0), indent=2)
-    print(f"{map}\n")
+    map_str: str = json.dumps(fpga_pci_wrapper.pci_get_resource_map(slot_id, pf_id=0), indent=2)
+    print(f"{map_str}\n")
 
 
 if __name__ == "__main__":

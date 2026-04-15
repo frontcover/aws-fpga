@@ -396,7 +396,8 @@ int interrupt_example(int slot_id, int interrupt_number)
 {
     pci_bar_handle_t pci_bar_handle = PCI_BAR_HANDLE_INIT;
     struct pollfd fds[1];
-    uint32_t fd, rd, read_data;
+    int fd = -1;
+    uint32_t rd, read_data;
     char event_file_name[256];
     int rc = 0;
     int poll_timeout = 1000;
@@ -419,7 +420,8 @@ int interrupt_example(int slot_id, int interrupt_number)
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
     log_info("Polling device file: %s for interrupt events", event_file_name);
-    if ((fd = open(event_file_name, O_RDONLY)) == -1)
+    fd = open(event_file_name, O_RDONLY);
+    if (fd == -1)
     {
         log_error("Error - invalid device\n");
         fail_on((rc = 1), out, "Unable to open event device");
@@ -454,7 +456,6 @@ int interrupt_example(int slot_id, int interrupt_number)
         log_error("No interrupt generated- something went wrong.");
         fail_on((rc = 1), out, "Interrupt generation failed");
     }
-    close(fd);
 
     // Clear the interrupt register
     do
@@ -472,9 +473,13 @@ int interrupt_example(int slot_id, int interrupt_number)
     } while (!read_data && poll_limit > 0);
 
 out:
-    if (fd)
+    if (fd >= 0)
     {
         close(fd);
+    }
+    if (pci_bar_handle != PCI_BAR_HANDLE_INIT)
+    {
+        fpga_pci_detach(pci_bar_handle);
     }
     return rc;
 }
